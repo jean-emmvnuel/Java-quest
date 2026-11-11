@@ -43,6 +43,12 @@ export const OBJECT_TYPES = {
       notes: { params: [], ret: 'int[]', doc: 'renvoie le tableau des notes de la classe' },
     },
   },
+  entrepot: {
+    type: 'Entrepot',
+    methods: {
+      poids: { params: [], ret: 'int[]', doc: 'renvoie le poids (en kg) de chaque colis arrivé ce matin' },
+    },
+  },
   caisse: {
     type: 'Caisse',
     methods: {
@@ -127,6 +133,9 @@ export const API = {
   },
   ecole: {
     notes(w) { return { value: [...w.notes], desc: `L'école transmet ${w.notes.length} notes.` }; },
+  },
+  entrepot: {
+    poids(w) { return { value: [...w.poids], desc: `L'entrepôt transmet le poids de ${w.poids.length} colis.` }; },
   },
   caisse: {
     prix(w) { return { value: [...w.prix], desc: `La caisse transmet ${w.prix.length} prix.` }; },
