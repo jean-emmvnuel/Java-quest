@@ -23,8 +23,8 @@ export default function TopBar({ level, levelIndex, total, totalStars, maxStars,
       <nav className="level-nav" aria-label="Niveaux">
         <button className="round-btn" disabled={levelIndex === 0} onClick={onPrev} aria-label="Niveau précédent" type="button"><Icon name="left" /></button>
         <button className="level-pill" onClick={onOpenMap} type="button">
-          <span className="level-mission">Mission {level.mission.num} · {level.mission.title}</span>
-          <span className="level-name">Niveau {level.id} <Icon name="down" size={14} /></span>
+          <span className="level-mission">{level.mission.project ? 'Projet' : `Mission ${level.mission.num}`} · {level.mission.title}</span>
+          <span className="level-name">{level.mission.project ? 'Étape' : 'Niveau'} {level.id} <Icon name="down" size={14} /></span>
         </button>
         <button className="round-btn" disabled={levelIndex >= total - 1} onClick={onNext} aria-label="Niveau suivant" type="button"><Icon name="right" /></button>
       </nav>

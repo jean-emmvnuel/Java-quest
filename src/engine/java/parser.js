@@ -54,8 +54,12 @@ export function parse(tokens) {
     const tok = peek(k);
     let n;
     if (tok.t === 'kw' && (PRIMITIVES.has(tok.v) || UNSUPPORTED_TYPES.has(tok.v) || tok.v === 'var')) n = 1;
-    else if (tok.t === 'id') n = 1;
-    else return 0;
+    else if (tok.t === 'id') {
+      n = 1;
+      // Type générique : ArrayList<String>
+      const arg = peek(k + 2);
+      if (isOp('<', k + 1) && (arg.t === 'id' || (arg.t === 'kw' && PRIMITIVES.has(arg.v))) && isOp('>', k + 3)) n = 4;
+    } else return 0;
     while (isOp('[', k + n) && isOp(']', k + n + 1)) n += 2;
     return n;
   }
@@ -73,6 +77,15 @@ export function parse(tokens) {
     }
     if (tok.t !== 'id' && tok.t !== 'kw') throw compileError(`Type attendu, mais ${describe(tok)} trouvé.`, tok.line);
     let type = tok.v;
+    if (tok.t === 'id' && isOp('<')) {
+      next();
+      const arg = next();
+      if (arg.t !== 'id') throw compileError(`Type des éléments attendu entre < et >, mais ${describe(arg)} trouvé.`, arg.line,
+        arg.t === 'kw' ? `Dans une ArrayList, on écrit les types de base avec une majuscule : ${{ int: 'Integer', double: 'Double', boolean: 'Boolean', char: 'Character' }[arg.v] ?? 'Integer'}.` : undefined);
+      if (isOp('>>')) throw compileError('Les listes de listes ne sont pas prises en charge.', arg.line);
+      expectOp('>');
+      type = `${tok.v}<${arg.v}>`;
+    }
     while (isOp('[')) {
       next();
       expectOp(']');
@@ -576,8 +589,20 @@ export function parse(tokens) {
       return { type: 'NewArray', elemType: type.slice(0, -2), arrayType: type, size, line: tok.line };
     }
     if (typeTok.t === 'kw') throw compileError(`new ${typeTok.v} : un type de base ne se crée pas avec new (sauf un tableau : new ${typeTok.v}[5]).`, tok.line);
+    let typeArg = null;
+    let generic = false;
+    if (isOp('<')) {
+      generic = true;
+      next();
+      if (!isOp('>')) {
+        const arg = next();
+        if (arg.t !== 'id') throw compileError(`Type des éléments attendu entre < et >, mais ${describe(arg)} trouvé.`, arg.line);
+        typeArg = arg.v;
+      }
+      expectOp('>');
+    }
     const args = parseArgs();
-    return { type: 'New', cls: typeTok.v, args, line: tok.line };
+    return { type: 'New', cls: typeTok.v, typeArg, generic, args, line: tok.line };
   }
 
   function parsePrimary() {

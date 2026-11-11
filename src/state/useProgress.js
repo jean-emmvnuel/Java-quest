@@ -43,11 +43,16 @@ export function useProgress() {
   const patch = (field, id, value) => setState((s) => ({ ...s, [field]: { ...s[field], [id]: value } }));
 
   const level = LEVELS.find((l) => l.id === state.current) ?? LEVELS[0];
+  const levelIndex = LEVELS.indexOf(level);
+  // Projets : une étape reprend le code écrit à l'étape précédente (sinon la solution précédente)
+  const prev = level.carry ? LEVELS[levelIndex - 1] : null;
+  const starter = (prev && state.codes[prev.id]) ?? level.starter;
 
   return {
     level,
-    levelIndex: LEVELS.indexOf(level),
-    code: state.codes[level.id] ?? level.starter,
+    levelIndex,
+    starter,
+    code: state.codes[level.id] ?? starter,
     hintsUsed: state.hints[level.id] ?? 0,
     stars: state.stars,
     totalStars: Object.values(state.stars).reduce((a, b) => a + b, 0),

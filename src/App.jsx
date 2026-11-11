@@ -39,7 +39,7 @@ function helpFor({ compileError, result, pb }) {
 export default function App() {
   const progress = useProgress();
   const { level, levelIndex, code } = progress;
-  const { result, compileError, stale, typing, idle, runId } = useAutoRun(level, code);
+  const { result, compileError, stale, typing, idle, runId } = useAutoRun(level, code, progress.starter);
   const pb = usePlayback(result, runId);
 
   const [preview, setPreview] = useState(0);

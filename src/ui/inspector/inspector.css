@@ -146,3 +146,6 @@
 .obj-changed { background: var(--blue-soft); }
 .obj-changed .obj-value { animation: pop 420ms var(--ease-out); color: var(--blue-ink); }
 .obj-none { color: var(--ink-4); font-size: 13px; }
+
+.obj-field-list { flex-direction: column; align-items: flex-start; gap: 4px; }
+.obj-field-list .cell-value { font-size: 13px; }

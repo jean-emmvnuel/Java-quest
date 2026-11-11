@@ -5,6 +5,10 @@ L'application est installable (PWA) et fonctionne **hors connexion**.
 
 Missions jouables : 1 Découverte · 2 Variables · 3 Conditions · 4 Boucles · 5 Tableaux · 6 Fonctions et procédures · 7 Classes et objets · 8 Héritage · 9 POO approfondie · 10 Mission combinée (44 niveaux).
 
+Projets de la vie réelle : **Application bancaire** (6 étapes : compte, opérations sécurisées, historique avec `ArrayList`, virements, banque, compte épargne). Chaque étape reprend le code écrit à l'étape précédente, comme dans un vrai projet. Les projets « Suivi des dépenses », « Pendu ou Morpion » et « Gestion des employés » arrivent ensuite.
+
+Java pris en charge : types de base, `String`, conditions, boucles (dont for-each), tableaux, `ArrayList<T>`, méthodes, classes, constructeurs, `private`, héritage, `super`, `@Override`, polymorphisme, classes abstraites et interfaces.
+
 ```bash
 npm install
 npm run dev      # http://localhost:5173
@@ -23,6 +27,7 @@ src/
     runLevel.js      Compile, exécute chaque situation de test et valide le niveau
   content/           Contenu pédagogique, sans code d'interface
     missions/        Un fichier par mission (niveaux, consignes, tests)
+    projects/        Projets de la vie réelle (étapes qui reprennent le code précédent : carry)
     validators.js    Aides de validation partagées
     index.js         Catalogue : missions, projets à venir, liste des niveaux
   state/             Hooks React : progression (étoiles), exécution automatique, lecture de la trace

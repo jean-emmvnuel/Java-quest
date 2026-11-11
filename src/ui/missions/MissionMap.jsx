@@ -28,50 +28,21 @@ export default function MissionMap({ open, onClose, currentId, stars, onPick }) 
         </header>
 
         <div className="sheet-scroll">
-          {MISSIONS.map((m) => {
-            const got = m.levels.reduce((a, l) => a + (stars[l.id] ?? 0), 0);
-            return (
-              <section key={m.id} className={`island ${m.upcoming ? 'locked' : ''}`} style={{ '--hue': (m.num * 47) % 360 }}>
-                <div className="island-head">
-                  <span className="island-num">{m.upcoming ? <Icon name="lock" size={18} /> : m.num}</span>
-                  <div>
-                    <h3>{m.title} <span className="island-place">· {m.place}</span></h3>
-                    <p>{m.summary}</p>
-                  </div>
-                  {!m.upcoming && <span className="island-stars"><Icon name="star" size={16} /> {got}/{m.levels.length * 3}</span>}
-                  {m.upcoming && <span className="soon">Bientôt</span>}
-                </div>
-                {!m.upcoming && (
-                  <ol className="path">
-                    {m.levels.map((l) => (
-                      <li key={l.id}>
-                        <button
-                          type="button"
-                          className={`node ${stars[l.id] ? 'done' : ''} ${l.id === currentId ? 'current' : ''}`}
-                          onClick={() => onPick(l.id)}
-                          title={l.title}
-                        >
-                          <span className="node-dot">{l.id.split('-')[1]}</span>
-                          <span className="node-title">{l.title}</span>
-                          <Stars count={stars[l.id] ?? 0} size={12} />
-                        </button>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </section>
-            );
-          })}
+          {MISSIONS.map((m) => <Island key={m.id} m={m} stars={stars} currentId={currentId} onPick={onPick} />)}
 
           <section className="projects">
             <h3>Projets de la vie réelle</h3>
-            <p>Quand tu maîtriseras les objets, tu construiras de vraies applications.</p>
+            <p>De vraies applications, construites étape par étape : chaque étape reprend ton code de l'étape précédente.</p>
+            {PROJECTS.filter((p) => !p.upcoming).map((p) => (
+              <Island key={p.id} m={p} stars={stars} currentId={currentId} onPick={onPick} />
+            ))}
             <div className="project-grid">
-              {PROJECTS.map((p) => (
+              {PROJECTS.filter((p) => p.upcoming).map((p) => (
                 <div key={p.id} className="project">
                   <Icon name="lock" size={16} />
                   <h4>{p.title}</h4>
                   <p>{p.summary}</p>
+                  <span className="soon">Bientôt</span>
                 </div>
               ))}
             </div>
@@ -79,5 +50,42 @@ export default function MissionMap({ open, onClose, currentId, stars, onPick }) 
         </div>
       </div>
     </div>
+  );
+}
+
+/** Une mission (ou un projet) : en-tête, étoiles gagnées et chemin des niveaux. */
+function Island({ m, stars, currentId, onPick }) {
+  const got = m.levels.reduce((a, l) => a + (stars[l.id] ?? 0), 0);
+  const hue = m.project ? 145 : (m.num * 47) % 360;
+  return (
+    <section className={`island ${m.upcoming ? 'locked' : ''} ${m.project ? 'island-project' : ''}`} style={{ '--hue': hue }}>
+      <div className="island-head">
+        <span className="island-num">{m.upcoming ? <Icon name="lock" size={18} /> : m.project ? '★' : m.num}</span>
+        <div>
+          <h3>{m.title} <span className="island-place">· {m.place}</span></h3>
+          <p>{m.summary}</p>
+        </div>
+        {!m.upcoming && <span className="island-stars"><Icon name="star" size={16} /> {got}/{m.levels.length * 3}</span>}
+        {m.upcoming && <span className="soon">Bientôt</span>}
+      </div>
+      {!m.upcoming && (
+        <ol className="path">
+          {m.levels.map((l) => (
+            <li key={l.id}>
+              <button
+                type="button"
+                className={`node ${stars[l.id] ? 'done' : ''} ${l.id === currentId ? 'current' : ''}`}
+                onClick={() => onPick(l.id)}
+                title={l.title}
+              >
+                <span className="node-dot">{l.id.split('-')[1]}</span>
+                <span className="node-title">{l.title}</span>
+                <Stars count={stars[l.id] ?? 0} size={12} />
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
   );
 }

@@ -89,7 +89,9 @@
 .projects { padding: 16px; border-radius: 22px; background: #fff; border: 3px dashed var(--line); }
 .projects h3 { margin: 0; font: 700 19px var(--font-display); }
 .projects > p { margin: 2px 0 12px; color: var(--ink-3); font-size: 14px; }
-.project-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.projects .island { margin-bottom: 12px; }
+.project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.project .soon { display: inline-block; margin-top: 6px; }
 .project { padding: 12px 14px; border-radius: 16px; background: #f6f8fc; color: var(--ink-3); }
 .project h4 { margin: 4px 0 2px; font: 700 15px var(--font-display); color: var(--ink-2); }
 .project p { margin: 0; font-size: 13px; }

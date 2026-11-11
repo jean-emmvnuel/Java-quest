@@ -24,9 +24,9 @@ function ObjectView({ object }) {
     <span className="obj">
       <span className="obj-head">{object.cls} <small>n°{object.id}</small></span>
       {object.fields.map((f) => (
-        <span key={f.name} className={`obj-field ${f.changed ? 'obj-changed' : ''}`}>
+        <span key={f.name} className={`obj-field ${f.array ? 'obj-field-list' : ''} ${f.changed ? 'obj-changed' : ''}`}>
           <span className="obj-name">{f.name}</span>
-          <span className="obj-value" key={f.value}>{f.value}</span>
+          {f.array ? <ArrayView items={f.array} /> : <span className="obj-value" key={f.value}>{f.value}</span>}
         </span>
       ))}
       {object.fields.length === 0 && <span className="obj-field obj-none">aucun attribut</span>}

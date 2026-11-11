@@ -12,6 +12,24 @@ const promote = (a, b) => (a === 'double' || b === 'double' ? 'double' : 'int');
 export const isArray = (t) => typeof t === 'string' && t.endsWith('[]');
 export const elemOf = (t) => t.slice(0, -2);
 
+// ArrayList<T> : les types de base s'écrivent avec leur « enveloppe » (Integer, Double…)
+export const WRAPPERS = { Integer: 'int', Double: 'double', Boolean: 'boolean', Character: 'char' };
+export const isList = (t) => typeof t === 'string' && t.startsWith('ArrayList<') && t.endsWith('>');
+export const listElem = (t) => { const a = t.slice(10, -1); return WRAPPERS[a] ?? a; };
+const ANY_LIST = 'ArrayList<?>';
+
+export const LIST_METHODS = {
+  add: (E) => [{ params: [E], ret: 'void' }, { params: ['int', E], ret: 'void' }],
+  get: (E) => [{ params: ['int'], ret: E }],
+  set: (E) => [{ params: ['int', E], ret: 'void' }],
+  remove: (E) => [{ params: ['int'], ret: E }],
+  size: () => [{ params: [], ret: 'int' }],
+  isEmpty: () => [{ params: [], ret: 'boolean' }],
+  contains: (E) => [{ params: [E], ret: 'boolean' }],
+  indexOf: (E) => [{ params: [E], ret: 'int' }],
+  clear: () => [{ params: [], ret: 'void' }],
+};
+
 export const MATH_METHODS = {
   abs: { arity: 1, ret: (ts) => (ts[0] === 'double' ? 'double' : 'int') },
   max: { arity: 2, ret: (ts) => promote(ts[0], ts[1]) },
@@ -71,7 +89,7 @@ export function check(program, objects = {}) {
 
   // ---------- Types ----------
   const isClass = (t) => classes.has(t);
-  const isRef = (t) => t === 'String' || t === 'null' || isArray(t) || isClass(t);
+  const isRef = (t) => t === 'String' || t === 'null' || isArray(t) || isList(t) || isClass(t);
   /** La classe elle-même, puis ses parents et ses interfaces (dans cet ordre). */
   const ancestors = (name) => {
     const out = [];
@@ -97,6 +115,8 @@ export function check(program, objects = {}) {
     if (dst === 'int' && src === 'char') return null;
     if (src === 'null' && isRef(dst)) return null;
     if (isClass(dst) && isClass(src) && isSub(src, dst)) return null;
+    if (isList(dst) && src === ANY_LIST) return null;
+    if (isList(dst) && isList(src)) return `une ${src} n'est pas une ${dst} : le type des éléments doit être le même.`;
     if (dst === 'int' && src === 'double') return 'conversion avec perte possible de double vers int.';
     if (dst === 'char' && (src === 'int' || src === 'double')) return `conversion avec perte possible de ${src} vers char.`;
     if (isClass(dst) && isClass(src) && isSub(dst, src)) return `un ${src} n'est pas forcément un ${dst}.`;
@@ -117,6 +137,13 @@ export function check(program, objects = {}) {
     if (t === 'var' && allowVar) return;
     let base = t;
     while (isArray(base)) base = elemOf(base);
+    if (isList(base)) {
+      const arg = base.slice(10, -1);
+      if (WRAPPERS[arg] || arg === 'String' || isClass(arg)) return;
+      throw compileError(`Type d'éléments inconnu dans ${base} : ${arg}.`, line, 'Exemples : ArrayList<String>, ArrayList<Integer>, ArrayList<Compte>.');
+    }
+    if (base === 'ArrayList' || base === 'List') throw compileError('Précise le type des éléments de la liste : ArrayList<String>, ArrayList<Integer>…', line);
+    if (WRAPPERS[base]) throw compileError(`${base} s'utilise dans une liste (ArrayList<${base}>). Pour une variable, écris ${WRAPPERS[base]}.`, line);
     if (PRIMS.has(base) || base === 'String' || isClass(base)) return;
     if (base === 'var') throw compileError('var ne s\'utilise que pour une variable locale qui reçoit tout de suite une valeur.', line);
     const guess = closest(base, ['int', 'double', 'boolean', 'char', 'String', ...classes.keys()]);
@@ -366,8 +393,8 @@ export function check(program, objects = {}) {
         return;
       case 'ForEach': {
         const t = expr(s.iter);
-        if (!isArray(t)) throw compileError(`La boucle for (… : …) parcourt un tableau, mais ici c'est un ${t}.`, s.line);
-        const el = elemOf(t);
+        if (!isArray(t) && !isList(t)) throw compileError(`La boucle for (… : …) parcourt un tableau ou une liste, mais ici c'est un ${t}.`, s.line);
+        const el = isList(t) ? listElem(t) : elemOf(t);
         if (s.varType !== 'var') {
           validType(s.varType, s.line);
           const err = assignError(s.varType, el);
@@ -510,6 +537,12 @@ export function check(program, objects = {}) {
         return e.arrayType;
       }
       case 'New': {
+        if (e.cls === 'ArrayList' && !classes.has('ArrayList')) {
+          if (e.args.length) throw compileError('new ArrayList<>() ne prend pas de valeur entre parenthèses : la liste commence vide.', e.line, 'Ajoute ensuite les éléments avec add(…).');
+          if (!e.generic) throw compileError('Écris new ArrayList<>() (avec les chevrons < >).', e.line);
+          if (e.typeArg) { validType(`ArrayList<${e.typeArg}>`, e.line); return `ArrayList<${e.typeArg}>`; }
+          return ANY_LIST;
+        }
         const c = classes.get(e.cls);
         if (!c) {
           if (e.cls === 'String') throw compileError('Pour créer un texte, écris-le simplement entre guillemets : "Bonjour".', e.line);
@@ -538,6 +571,7 @@ export function check(program, objects = {}) {
           throw compileError(`${e.obj.name}.${e.name} : il manque les parenthèses de la méthode → ${e.obj.name}.${e.name}()`, e.line);
         }
         const t = expr(e.obj);
+        if (isList(t)) throw compileError('Pour une ArrayList, la taille s\'obtient avec la méthode size().', e.line, `Écris ${e.obj.type === 'Ident' ? e.obj.name : 'liste'}.size()`);
         if (isArray(t)) {
           if (e.name !== 'length') throw compileError(`Un tableau n'a pas d'attribut ${e.name} : seulement length (sa taille).`, e.line);
           e.isLength = true;
@@ -558,6 +592,7 @@ export function check(program, objects = {}) {
       }
       case 'Index': {
         const t = expr(e.obj);
+        if (isList(t)) throw compileError('Pour une ArrayList, on lit un élément avec get(i), pas avec des crochets [ ].', e.line, `Écris ${e.obj.type === 'Ident' ? e.obj.name : 'liste'}.get(…)`);
         if (!isArray(t)) throw compileError(`On ne peut utiliser [ ] que sur un tableau, or ici c'est un ${t}.`, e.line, t === 'String' ? 'Pour un caractère d\'un String, utilise charAt(indice).' : undefined);
         const it = expr(e.index);
         if (it !== 'int' && it !== 'char') throw compileError(`Le numéro de case doit être un int, pas un ${it}.`, e.line);
@@ -809,6 +844,24 @@ export function check(program, objects = {}) {
       checkParams(e, e.name, m.params, m.optional);
       e.kind = 'string';
       return m.ret;
+    }
+    if (isList(t)) {
+      const E = listElem(t);
+      const make = LIST_METHODS[e.name];
+      if (!make) {
+        const guess = closest(e.name, Object.keys(LIST_METHODS));
+        throw compileError(`Une ArrayList n'a pas de méthode ${e.name}().`, e.line, guess ? `Voulais-tu écrire ${guess}() ?` : `Méthodes utiles : add, get, set, remove, size, isEmpty, contains.`);
+      }
+      const ts = argTypes(e);
+      const variant = make(E).find((v) => v.params.length === ts.length && v.params.every((p, i) => !assignError(p, ts[i])));
+      if (!variant) {
+        const sigs = make(E).map((v) => `${e.name}(${v.params.join(', ')})`).join(' ou ');
+        throw compileError(`${e.name}(${ts.join(', ')}) : les valeurs ne correspondent pas à cette liste de ${E}.`, e.line, `Attendu : ${sigs}.`);
+      }
+      e.kind = 'list';
+      e.listElem = E;
+      e.paramTypes = variant.params;
+      return variant.ret;
     }
     if (isArray(t)) {
       if (e.name === 'length') throw compileError('Pour un tableau, la taille s\'écrit sans parenthèses : tableau.length', e.line, 'length() avec parenthèses, c\'est pour les String.');

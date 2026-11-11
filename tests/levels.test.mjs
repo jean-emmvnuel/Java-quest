@@ -139,5 +139,16 @@ fileErr('extends interface', 'interface I { void f(); }\nclass A extends I { pub
 fileErr('méthode interface manquante', 'interface I { void f(); }\nclass A implements I { }\n' + main(''), /doit écrire la méthode void f\(\)/);
 fileOut('tableau d\'interface', iface + main('Rechargeable[] t = {new Drone(), new Drone()}; int s = 0; for (Rechargeable r : t) { s += r.batterie(); } System.out.println(s);'), '60\n');
 
+
+console.log('\nArrayList');
+fileOut('ArrayList de String', main('ArrayList<String> h = new ArrayList<>(); h.add("a"); h.add("b"); h.add(0, "z"); System.out.println(h.size() + " " + h.get(0) + " " + h); for (String x : h) System.out.print(x); System.out.println();'), '3 z [z, a, b]\nzab\n');
+fileOut('ArrayList d\'Integer', main('ArrayList<Integer> l = new ArrayList<>(); for (int i = 1; i <= 3; i++) l.add(i * 10); int s = 0; for (int x : l) s += x; l.remove(0); l.set(0, 5); System.out.println(s + " " + l + " " + l.contains(30) + " " + l.isEmpty());'), '60 [5, 30] true false\n');
+fileOut('ArrayList d\'objets', 'class C { String n; C(String n) { this.n = n; } }\n' + main('ArrayList<C> l = new ArrayList<C>(); l.add(new C("x")); System.out.println(l.get(0).n);'), 'x\n');
+fileErr('get hors limites', main('ArrayList<String> l = new ArrayList<>(); l.get(0);'), /IndexOutOfBounds/);
+fileErr('length sur liste', main('ArrayList<String> l = new ArrayList<>(); int n = l.length;'), /size\(\)/);
+fileErr('crochets sur liste', main('ArrayList<String> l = new ArrayList<>(); String s = l[0];'), /get\(i\)/);
+fileErr('int dans les chevrons', main('ArrayList<int> l = new ArrayList<>();'), /Type des éléments|Integer/);
+fileErr('mauvais type ajouté', main('ArrayList<String> l = new ArrayList<>(); l.add(5);'), /ne correspondent pas/);
+
 console.log(failures ? `\n${failures} échec(s)` : '\nTout est vert.');
 process.exit(failures ? 1 : 0);

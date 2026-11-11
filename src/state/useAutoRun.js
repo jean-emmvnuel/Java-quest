@@ -14,7 +14,7 @@ const IDLE_MS = 3000;
  * - `idle` passe à true après quelques secondes sans frappe : l'interface peut alors
  *   proposer (sans l'imposer) un bouton d'aide.
  */
-export function useAutoRun(level, code) {
+export function useAutoRun(level, code, starter = level.starter) {
   const [latest, setLatest] = useState(null);
   const [shown, setShown] = useState(null);
   const [runId, setRunId] = useState(0);
@@ -28,7 +28,7 @@ export function useAutoRun(level, code) {
 
   useEffect(() => {
     setIdle(false);
-    if (code === level.starter) {
+    if (code === starter) {
       setLatest(null);
       setShown(null);
       setTyping(false);
@@ -46,7 +46,7 @@ export function useAutoRun(level, code) {
     }, DEBOUNCE_MS);
     const rest = setTimeout(() => setIdle(true), IDLE_MS);
     return () => { clearTimeout(run); clearTimeout(rest); };
-  }, [level, code]);
+  }, [level, code, starter]);
 
   return {
     /** dernière exécution réussie à compiler : c'est elle qu'on rejoue */

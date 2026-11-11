@@ -1,6 +1,6 @@
 import { runtimeError, JavaError } from './errors.js';
 import { toJavaString, literal } from './format.js';
-import { isArray, elemOf } from './checker.js';
+import { isArray, elemOf, isList, listElem } from './checker.js';
 
 // Exécution du programme vérifié, avec enregistrement d'une trace : à chaque étape on garde
 // la ligne exécutée, une explication en français, la mémoire (variables de chaque méthode,
@@ -24,6 +24,7 @@ const toInt = (v) => {
 };
 
 function coerce(type, v, srcType) {
+  if (v?.kind === 'list' && v.elem === '?' && isList(type)) { v.type = type; v.elem = listElem(type); }
   if (type === 'int') return srcType === 'double' ? toInt(v) : v | 0;
   if (type === 'char') return (srcType === 'double' ? toInt(v) : v) & 0xffff;
   if (type === 'double') return Number(v);
@@ -43,6 +44,7 @@ export function fmt(type, v) {
   if (v === undefined) return '?';
   if (v === null) return 'null';
   if (v?.kind === 'array') return `tableau ${v.type.replace('[]', `[${v.items.length}]`)}`;
+  if (v?.kind === 'list') return `liste de ${v.items.length} élément${v.items.length > 1 ? 's' : ''}`;
   if (v?.kind === 'object') return `${v.cls} n°${v.id}`;
   return literal(type, v);
 }
@@ -108,8 +110,8 @@ export function execute(program, { world, api = {} }) {
 
   // ---------- Mémoire (instantané pour l'interface) ----------
   function viewValue(type, v) {
-    if (isRefValue(v) && v.kind === 'array') {
-      const el = elemOf(v.type);
+    if (isRefValue(v) && (v.kind === 'array' || v.kind === 'list')) {
+      const el = v.kind === 'list' ? v.elem : elemOf(v.type);
       return {
         value: `${v.items.length} case${v.items.length > 1 ? 's' : ''}`,
         array: v.items.map((it, i) => ({ value: fmt(el, it), changed: changed.has(`${v.id}:${i}`) })),
@@ -121,9 +123,16 @@ export function execute(program, { world, api = {} }) {
         object: {
           cls: v.cls,
           id: v.id,
-          fields: Object.entries(v.fields).map(([name, fv]) => ({
-            name, type: v.types[name], value: fmt(v.types[name], fv), changed: changed.has(`${v.id}:${name}`),
-          })),
+          fields: Object.entries(v.fields).map(([name, fv]) => {
+            const field = { name, type: v.types[name], value: fmt(v.types[name], fv), changed: changed.has(`${v.id}:${name}`) };
+            // un tableau ou une liste rangé dans un attribut s'affiche aussi en cases
+            if (isRefValue(fv) && (fv.kind === 'array' || fv.kind === 'list')) {
+              const el = fv.kind === 'list' ? fv.elem : elemOf(fv.type);
+              field.array = fv.items.map((it, i) => ({ value: fmt(el, it), changed: changed.has(`${fv.id}:${i}`) }));
+              if (changed.has(`${fv.id}:removed`) || field.array.some((c) => c.changed)) field.changed = true;
+            }
+            return field;
+          }),
         },
       };
     }
@@ -202,6 +211,48 @@ export function execute(program, { world, api = {} }) {
     return { kind: 'array', type, items, id: ++heapId };
   }
 
+  function newList(type) {
+    return { kind: 'list', type: isList(type) ? type : 'ArrayList<?>', elem: isList(type) ? listElem(type) : '?', items: [], id: ++heapId };
+  }
+
+  const sameValue = (a, b) => a === b;
+
+  function listCall(e) {
+    const list = evalExpr(e.obj);
+    if (list === null) throw nullError(show(e.obj), e.line);
+    const args = e.args.map(evalExpr).map((v, i) => coerce(e.paramTypes[i], v, e.args[i].st));
+    // La liste créée avec new ArrayList<>() prend son vrai type à la première utilisation
+    if (list.elem === '?' && isList(e.obj.st)) { list.type = e.obj.st; list.elem = listElem(e.obj.st); }
+    const n = list.items.length;
+    const bounds = (i, max) => {
+      if (i < 0 || i >= max) {
+        throw runtimeError(`IndexOutOfBoundsException : il n'y a pas d'élément n°${i}. La liste contient ${n} élément${n > 1 ? 's' : ''}${n ? ` (de 0 à ${n - 1})` : ''}.`, e.line,
+          n ? 'Le premier élément est le n°0 et le dernier le n°size() - 1.' : 'La liste est vide : ajoute des éléments avec add(…) avant de les lire.');
+      }
+    };
+    switch (e.name) {
+      case 'add':
+        if (args.length === 2) {
+          bounds(args[0], n + 1);
+          list.items.splice(args[0], 0, args[1]);
+          changed.add(`${list.id}:${args[0]}`);
+        } else {
+          list.items.push(args[0]);
+          changed.add(`${list.id}:${n}`);
+        }
+        return undefined;
+      case 'get': bounds(args[0], n); return list.items[args[0]];
+      case 'set': bounds(args[0], n); list.items[args[0]] = args[1]; changed.add(`${list.id}:${args[0]}`); return undefined;
+      case 'remove': { bounds(args[0], n); const [old] = list.items.splice(args[0], 1); changed.add(`${list.id}:removed`); return old; }
+      case 'size': return n;
+      case 'isEmpty': return n === 0;
+      case 'contains': return list.items.some((x) => sameValue(x, args[0]));
+      case 'indexOf': return list.items.findIndex((x) => sameValue(x, args[0]));
+      case 'clear': list.items = []; changed.add(`${list.id}:removed`); return undefined;
+      default: return undefined;
+    }
+  }
+
   function makeArray(type, size, line) {
     if (size < 0) throw runtimeError(`NegativeArraySizeException : un tableau ne peut pas avoir ${size} cases.`, line);
     if (size > 10000) throw runtimeError('Tableau trop grand pour Java Quest (10 000 cases au maximum).', line);
@@ -234,6 +285,9 @@ export function execute(program, { world, api = {} }) {
       const m = findMethodRuntime(v.cls, 'toString', '');
       if (m && m.ret === 'String') return invoke(m, v, [], { line, label: 'toString()' });
       return `${v.cls}@${hashOf(v.id)}`;
+    }
+    if (v?.kind === 'list') {
+      return `[${v.items.map((it) => toStr(v.elem, it, line)).join(', ')}]`;
     }
     if (v?.kind === 'array') {
       const code = { int: 'I', double: 'D', boolean: 'Z', char: 'C' }[elemOf(v.type)] ?? `L${elemOf(v.type)};`;
@@ -314,7 +368,9 @@ export function execute(program, { world, api = {} }) {
       }
       case 'ArrayLit': return arrayLit(e, e.arrayType);
       case 'NewArray': return makeArray(e.arrayType, evalExpr(e.size), e.line);
-      case 'New': return construct(e);
+      case 'New':
+        if (e.st && isList(e.st) || e.st === 'ArrayList<?>') return newList(e.st);
+        return construct(e);
       case 'Assign': return assign(e);
       case 'Update': {
         const loc = locate(e.target);
@@ -416,6 +472,7 @@ export function execute(program, { world, api = {} }) {
       }
       case 'math': return mathCall(e.name, e.args.map(evalExpr), e);
       case 'string': return stringCall(e);
+      case 'list': return listCall(e);
       case 'api': {
         const args = e.args.map(evalExpr);
         const impl = api[e.obj.name]?.[e.name];
@@ -743,17 +800,18 @@ export function execute(program, { world, api = {} }) {
         const arr = evalExpr(s.iter);
         if (arr === null) throw nullError(show(s.iter), s.line);
         const n = arr.items.length;
+        const items = [...arr.items];
         for (let i = 0; i < n; i++) {
-          const v = coerce(s.elemType, arr.items[i], elemOf(arr.type));
+          const v = coerce(s.elemType, items[i], arr.kind === 'list' ? arr.elem : elemOf(arr.type));
           let brk = false;
           withScope(() => {
             declare(s.name, s.elemType, v);
-            record(s.line, `Tour n°${i + 1} sur ${n} : \`${s.name}\` reçoit la case ${i} de ${show(s.iter)}, soit \`${fmt(s.elemType, v)}\`.`, 'cond');
+            record(s.line, `Tour n°${i + 1} sur ${n} : \`${s.name}\` reçoit ${arr.kind === 'list' ? "l'élément" : 'la case'} ${i} de ${show(s.iter)}, soit \`${fmt(s.elemType, v)}\`.`, 'cond');
             brk = runLoopBody(s.body) === 'break';
           });
           if (brk) break;
         }
-        record(s.line, `Fin de la boucle : les ${n} cases de ${show(s.iter)} ont été parcourues.`, 'scope');
+        record(s.line, `Fin de la boucle : ${n === 0 ? `${show(s.iter)} était vide, aucun tour.` : `les ${n} ${arr.kind === 'list' ? 'éléments' : 'cases'} de ${show(s.iter)} ont été parcourus.`}`, 'scope');
         return;
       }
       case 'Break':
