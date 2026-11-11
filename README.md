@@ -1,12 +1,16 @@
 # Java Quest
 
 Apprendre Java en voyant ce que le code fait réellement. Tout tourne dans le navigateur, sans backend.
+L'application est installable (PWA) et fonctionne **hors connexion**.
+
+Missions jouables : 1 Découverte · 2 Variables · 3 Conditions · 4 Boucles · 5 Tableaux · 6 Fonctions et procédures · 7 Classes et objets · 8 Héritage (38 niveaux).
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
 npm test         # vérifie les 16 niveaux et l'interpréteur
-npm run build
+npm run build    # version installable (dossier dist/)
+npm run preview  # tester la version installable et le mode hors connexion
 ```
 
 ## Architecture

@@ -58,3 +58,52 @@
   animation: rise 360ms var(--ease) both;
 }
 .hint .icon { flex: none; margin-top: 3px; color: #b07d00; }
+
+/* ---------- Progression de la mission ---------- */
+.mprog { display: flex; align-items: center; gap: 12px; }
+.mprog-bar { position: relative; flex: 1; height: 16px; border-radius: 999px; background: #e3e9f5; overflow: hidden; }
+.mprog-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: var(--green);
+  transition: width 700ms var(--ease-out);
+}
+.mprog-fill::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 8px;
+  right: 8px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+}
+.mprog-dots { display: flex; gap: 6px; }
+.mdot {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: #e3e9f5;
+  color: var(--ink-3);
+  font: 700 13px var(--font-display);
+  cursor: pointer;
+  transition: transform 120ms var(--ease-out);
+}
+.mdot:active { transform: scale(0.9); }
+.mdot.done { background: var(--green); color: #fff; box-shadow: 0 3px 0 var(--green-dark); }
+.mdot.current { background: var(--blue); color: #fff; box-shadow: 0 3px 0 var(--blue-dark); animation: ring 1.8s ease-out infinite; }
+@keyframes ring { 0% { box-shadow: 0 3px 0 var(--blue-dark), 0 0 0 0 rgba(79, 140, 255, 0.5); } 70% { box-shadow: 0 3px 0 var(--blue-dark), 0 0 0 10px rgba(79, 140, 255, 0); } }
+@media (max-width: 640px) { .mprog-dots { display: none; } }
+
+/* ---------- Arrivée d'un nouveau niveau ---------- */
+.level-enter .col { animation: slide-in 520ms var(--ease) both; }
+.level-enter .col-right { animation-delay: 80ms; }
+.bubble-row .mascot { animation: hop-in-small 600ms 200ms var(--ease-out) both; }
+.bubble { animation: bubble-pop 420ms 320ms var(--ease-out) both; transform-origin: bottom left; }
+@keyframes slide-in { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes hop-in-small { 0% { transform: translateY(16px) scale(0.7); opacity: 0; } 60% { transform: translateY(-6px) scale(1.05); opacity: 1; } 100% { transform: none; } }
+@keyframes bubble-pop { 0% { transform: scale(0.6); opacity: 0; } 70% { transform: scale(1.03); opacity: 1; } 100% { transform: none; } }

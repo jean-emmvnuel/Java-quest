@@ -16,6 +16,8 @@ import SuccessDialog from './ui/feedback/SuccessDialog.jsx';
 import MissionMap from './ui/missions/MissionMap.jsx';
 import Mascot from './ui/common/Mascot.jsx';
 import Icon from './ui/common/Icon.jsx';
+import MissionProgress from './ui/lesson/MissionProgress.jsx';
+import { isSoundOn, setSound, playTap } from './ui/feedback/sound.js';
 
 /**
  * Explication de ce qui ne va pas — affichée seulement si l'élève la demande
@@ -44,6 +46,7 @@ export default function App() {
   const [mapOpen, setMapOpen] = useState(false);
   const [win, setWin] = useState(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [soundOn, setSoundOn] = useState(isSoundOn);
 
   // Toute nouvelle frappe referme l'aide : on laisse l'élève écrire tranquillement
   useEffect(() => { setHelpOpen(false); }, [code]);
@@ -53,7 +56,7 @@ export default function App() {
 
   // Réussite : on enregistre les étoiles et on fête ça
   useEffect(() => {
-    if (pb.finished && result?.passed) setWin({ runId, stars: progress.complete() });
+    if (pb.finished && result?.passed) setWin({ runId, ...progress.complete() });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pb.finished, result, runId]);
 
@@ -91,7 +94,7 @@ export default function App() {
   else if (pb.playing) status = { cls: '', text: 'Exécution' };
   else if (result?.passed) status = { cls: 'ok', text: 'Réussi' };
 
-  const goTo = (id) => { progress.goTo(id); setMapOpen(false); };
+  const goTo = (id) => { playTap(); progress.goTo(id); setMapOpen(false); };
 
   return (
     <div className="app">
@@ -100,14 +103,19 @@ export default function App() {
         levelIndex={levelIndex}
         total={LEVELS.length}
         totalStars={progress.totalStars}
+        streak={progress.streak}
+        playedToday={progress.playedToday}
+        soundOn={soundOn}
+        onToggleSound={() => { setSound(!soundOn); setSoundOn(!soundOn); }}
         maxStars={LEVELS.length * 3}
         onPrev={() => goTo(LEVELS[levelIndex - 1].id)}
         onNext={() => goTo(nextLevel.id)}
         onOpenMap={() => setMapOpen(true)}
       />
 
-      <main className="layout">
+      <main className="layout level-enter" key={level.id}>
         <div className="col">
+          <MissionProgress mission={level.mission} currentId={level.id} stars={progress.stars} onPick={goTo} />
           <div className="title-block">
             <p className="eyebrow">{level.mission.place}</p>
             <h1>{level.title}</h1>
@@ -187,7 +195,9 @@ export default function App() {
 
       <SuccessDialog
         open={!!win && win.runId === runId}
-        stars={win?.stars ?? 0}
+        stars={win?.earned ?? 0}
+        gained={win?.gained ?? 0}
+        streak={progress.streak}
         multi={level.tests.length > 1}
         hasNext={!!nextLevel}
         onNext={() => goTo(nextLevel.id)}

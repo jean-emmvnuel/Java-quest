@@ -6,7 +6,18 @@ import { LEVELS } from '../content/index.js';
 
 const KEY = 'javaquest.progress.v2';
 
-const empty = () => ({ current: LEVELS[0].id, codes: {}, stars: {}, hints: {}, sawSolution: {} });
+const empty = () => ({ current: LEVELS[0].id, codes: {}, stars: {}, hints: {}, sawSolution: {}, streak: { days: 0, last: null } });
+
+const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const today = () => ymd(new Date());
+const yesterday = () => { const d = new Date(); d.setDate(d.getDate() - 1); return ymd(d); };
+
+/** Série de jours : +1 si on a joué hier, on repart à 1 sinon. */
+function nextStreak(streak) {
+  const d = today();
+  if (streak?.last === d) return streak;
+  return { days: streak?.last === yesterday() ? streak.days + 1 : 1, last: d };
+}
 
 function load() {
   try {
@@ -40,6 +51,8 @@ export function useProgress() {
     hintsUsed: state.hints[level.id] ?? 0,
     stars: state.stars,
     totalStars: Object.values(state.stars).reduce((a, b) => a + b, 0),
+    streak: state.streak?.last === today() || state.streak?.last === yesterday() ? state.streak.days : 0,
+    playedToday: state.streak?.last === today(),
     goTo: useCallback((id) => setState((s) => ({ ...s, current: id })), []),
     setCode: (code) => patch('codes', level.id, code),
     useHint: () => patch('hints', level.id, (state.hints[level.id] ?? 0) + 1),
@@ -47,11 +60,13 @@ export function useProgress() {
       patch('sawSolution', level.id, true);
       patch('codes', level.id, level.solution);
     },
-    /** Enregistre la réussite ; renvoie le nombre d'étoiles gagnées. */
+    /** Enregistre la réussite ; renvoie les étoiles obtenues et celles gagnées en plus. */
     complete: () => {
       const earned = starsFor(state.hints[level.id] ?? 0, state.sawSolution[level.id]);
-      if ((state.stars[level.id] ?? 0) < earned) patch('stars', level.id, earned);
-      return earned;
+      const before = state.stars[level.id] ?? 0;
+      if (before < earned) patch('stars', level.id, earned);
+      setState((s) => ({ ...s, streak: nextStreak(s.streak) }));
+      return { earned, gained: Math.max(0, earned - before) };
     },
   };
 }
