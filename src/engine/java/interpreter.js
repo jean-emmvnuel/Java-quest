@@ -471,6 +471,17 @@ export function execute(program, { world, api = {} }) {
         return undefined;
       }
       case 'math': return mathCall(e.name, e.args.map(evalExpr), e);
+      case 'parse': {
+        const text = evalExpr(e.args[0]);
+        if (text === null) throw nullError(show(e.args[0]), e.line);
+        const t = e.name === 'parseInt' ? text : text.trim();
+        const ok = e.name === 'parseInt' ? /^[+-]?\d+$/.test(t) && Math.abs(Number(t)) <= 2147483647 : t !== '' && !Number.isNaN(Number(t));
+        if (!ok) {
+          throw runtimeError(`NumberFormatException : le texte "${text}" ne contient pas un nombre valide.`, e.line,
+            e.name === 'parseInt' ? 'parseInt attend un entier écrit en chiffres, sans espace ni virgule : "42".' : 'parseDouble attend un nombre avec un point pour les décimales : "12.5".');
+        }
+        return e.name === 'parseInt' ? Number(t) | 0 : Number(t);
+      }
       case 'string': return stringCall(e);
       case 'list': return listCall(e);
       case 'api': {
@@ -643,6 +654,14 @@ export function execute(program, { world, api = {} }) {
       case 'startsWith': return s.startsWith(a);
       case 'endsWith': return s.endsWith(a);
       case 'trim': return s.trim();
+      case 'replace': return s.split(a).join(b);
+      case 'split': {
+        // Comme Java : le séparateur est une expression régulière, et les morceaux vides à la fin sont retirés
+        let parts;
+        try { parts = a === '' ? [...s] : s.split(new RegExp(a)); } catch { parts = s.split(a); }
+        while (parts.length > 1 && parts[parts.length - 1] === '') parts.pop();
+        return newArray('String[]', parts);
+      }
       case 'substring': {
         const end = b === undefined ? s.length : b;
         if (a < 0 || end > s.length || a > end) throw outOfBounds(a < 0 || a > s.length ? a : end);

@@ -9,6 +9,7 @@ import m8 from './missions/m8-heritage.js';
 import m9 from './missions/m9-poo.js';
 import m10 from './missions/m10-combinee.js';
 import banque from './projects/banque.js';
+import depenses from './projects/depenses.js';
 
 // Catalogue des missions. Pour ajouter une mission jouable : créer un fichier dans missions/ et l'ajouter ici.
 
@@ -16,7 +17,7 @@ import banque from './projects/banque.js';
 // Le code de chaque étape est repris à l'étape suivante (champ carry des niveaux).
 export const PROJECTS = [
   banque,
-  { id: 'depenses', title: 'Suivi des dépenses', summary: 'Revenus et dépenses par catégorie, totaux et historique sauvegardé.' },
+  depenses,
   { id: 'jeux', title: 'Pendu ou Morpion', summary: 'Programmer la logique complète d\'un jeu classique.' },
   { id: 'gestion', title: 'Gestion des employés', summary: 'Classes Employe et Departement, listes, salaires et moyennes.' },
 ].map((p) => (p.levels ? p : { ...p, levels: [], upcoming: true }));

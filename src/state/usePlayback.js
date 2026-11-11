@@ -37,7 +37,9 @@ export function usePlayback(result, runId) {
   useEffect(() => {
     if (!playing || !run) return undefined;
     if (atEnd) {
-      if (result.passed && runIdx < runs.length - 1) {
+      // Réussite : on enchaîne les situations testées, sauf si c'est long (on peut les ouvrir d'un clic)
+      const totalSteps = runs.reduce((n, r) => n + r.steps.length, 0);
+      if (result.passed && runIdx < runs.length - 1 && totalSteps <= 160) {
         const t = setTimeout(() => { setRunIdx((i) => i + 1); setStep(0); }, 600);
         return () => clearTimeout(t);
       }
@@ -45,10 +47,14 @@ export function usePlayback(result, runId) {
       setFinished(true);
       return undefined;
     }
-    const delay = current?.kind === 'cond' ? SPEEDS[speed] * 1.2 : SPEEDS[speed];
+    // Les longues exécutions (projets) sont rejouées plus vite pour durer environ 30 secondes au plus,
+    // sauf en vitesse « Lent » : on peut toujours avancer pas à pas.
+    const scale = speed === 'slow' ? 1 : Math.min(1, 75 / Math.max(steps.length, 1));
+    const base = Math.max(45, SPEEDS[speed] * scale);
+    const delay = current?.kind === 'cond' ? base * 1.2 : base;
     const t = setTimeout(() => setStep((s) => s + 1), delay);
     return () => clearTimeout(t);
-  }, [playing, run, atEnd, result, runIdx, runs.length, speed, current]);
+  }, [playing, run, atEnd, result, runIdx, runs.length, speed, current, steps.length]);
 
   // En pas à pas, atteindre la fin compte aussi comme « terminé »
   useEffect(() => {

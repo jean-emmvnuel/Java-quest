@@ -150,5 +150,13 @@ fileErr('crochets sur liste', main('ArrayList<String> l = new ArrayList<>(); Str
 fileErr('int dans les chevrons', main('ArrayList<int> l = new ArrayList<>();'), /Type des éléments|Integer/);
 fileErr('mauvais type ajouté', main('ArrayList<String> l = new ArrayList<>(); l.add(5);'), /ne correspondent pas/);
 
+
+console.log('\nTexte et nombres');
+expectOut('String[] p = "Pain;alimentation;-2.5".split(";"); System.out.println(p.length + " " + p[1] + " " + (Double.parseDouble(p[2]) * 2));', '3 alimentation -5.0\n');
+expectOut('System.out.println(Integer.parseInt("42") + 1);', '43\n');
+expectOut('System.out.println("a,b,,".split(",").length + " " + "x y".replace(" ", "-"));', '2 x-y\n');
+expectError('int n = Integer.parseInt("douze");', /NumberFormatException/);
+expectError('double d = Double.valueOf("1");', /pas disponible/);
+
 console.log(failures ? `\n${failures} échec(s)` : '\nTout est vert.');
 process.exit(failures ? 1 : 0);

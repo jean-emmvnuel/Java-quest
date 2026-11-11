@@ -55,6 +55,8 @@ export const STRING_METHODS = {
   endsWith: { params: ['String'], ret: 'boolean' },
   trim: { params: [], ret: 'String' },
   substring: { params: ['int'], optional: ['int'], ret: 'String' },
+  split: { params: ['String'], ret: 'String[]' },
+  replace: { params: ['String', 'String'], ret: 'String' },
 };
 
 function levenshtein(a, b) {
@@ -766,6 +768,15 @@ export function check(program, objects = {}) {
     }
     if (o && o.type === 'Member' && o.obj.type === 'Ident' && !lookupLocal(o.obj.name) && !objects[o.obj.name] && o.obj.name !== 'System' && !findField(ctx.cls.name, o.obj.name) && !isClass(o.obj.name)) {
       throw unknownSymbol(o.obj.name, e.line);
+    }
+
+    // Integer.parseInt / Double.parseDouble : lire un nombre écrit dans un texte
+    if (o && o.type === 'Ident' && (o.name === 'Integer' || o.name === 'Double') && !lookupLocal(o.name)) {
+      const want = o.name === 'Integer' ? 'parseInt' : 'parseDouble';
+      if (e.name !== want) throw compileError(`${o.name}.${e.name}() n'est pas disponible.`, e.line, `Pour lire un nombre écrit dans un texte : ${o.name}.${want}(texte)`);
+      checkParams(e, `${o.name}.${want}`, ['String']);
+      e.kind = 'parse';
+      return o.name === 'Integer' ? 'int' : 'double';
     }
 
     // Math.xxx

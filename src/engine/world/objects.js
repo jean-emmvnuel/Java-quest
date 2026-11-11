@@ -55,6 +55,14 @@ export const OBJECT_TYPES = {
       prix: { params: [], ret: 'double[]', doc: 'renvoie le tableau des prix des articles scannés' },
     },
   },
+  fichier: {
+    type: 'Fichier',
+    methods: {
+      ecrireLigne: { params: ['String'], ret: 'void', doc: 'ajoute une ligne à la fin du fichier depenses.txt' },
+      lignes: { params: [], ret: 'String[]', doc: 'renvoie toutes les lignes du fichier' },
+      vider: { params: [], ret: 'void', doc: 'efface tout le contenu du fichier' },
+    },
+  },
   leviers: {
     type: 'Leviers',
     methods: {
@@ -139,6 +147,14 @@ export const API = {
   },
   caisse: {
     prix(w) { return { value: [...w.prix], desc: `La caisse transmet ${w.prix.length} prix.` }; },
+  },
+  fichier: {
+    ecrireLigne(w, [ligne]) {
+      w.fichier.push(ligne ?? 'null');
+      return { desc: `Le fichier depenses.txt reçoit une nouvelle ligne (${w.fichier.length} au total).`, event: 'save' };
+    },
+    lignes(w) { return { value: [...w.fichier], desc: `Lecture du fichier depenses.txt : ${w.fichier.length} ligne${w.fichier.length > 1 ? 's' : ''}.` }; },
+    vider(w) { w.fichier = []; return { desc: 'Le fichier depenses.txt est vidé.' }; },
   },
   leviers: {
     activer(w, [n]) {
