@@ -77,7 +77,7 @@ export function show(e, vals) {
     case 'Member': return known && !e.isLength ? fmt(e.st, vals.get(e)) : known ? String(vals.get(e)) : `${show(e.obj)}.${e.name}`;
     case 'Index': return known ? fmt(e.st, vals.get(e)) : `${show(e.obj)}[${show(e.index)}]`;
     case 'ArrayLit': return `{${e.items.map((x) => show(x)).join(', ')}}`;
-    case 'NewArray': return `new ${e.elemType}[${show(e.size)}]`;
+    case 'NewArray': return `new ${e.arrayType.replace(/\[\]/g, '').trim()}${(e.sizes ?? [e.size]).map((x) => `[${show(x)}]`).join('')}${'[]'.repeat(Math.max(0, e.arrayType.split('[]').length - 1 - (e.sizes ?? [e.size]).length))}`;
     case 'New': return `new ${e.cls}(${e.args.map((a) => show(a)).join(', ')})`;
     case 'Super': return 'super';
     case 'Call': {
@@ -109,12 +109,18 @@ export function execute(program, { world, api = {} }) {
   const frame = () => frames[frames.length - 1];
 
   // ---------- Mémoire (instantané pour l'interface) ----------
+  // Une case de tableau ; pour un tableau 2D, chaque ligne s'affiche en entier (ex. « X . O »)
+  function cellText(el, it) {
+    if (it?.kind === 'array') return it.items.map((x) => (x === 0 && elemOf(it.type) === 'char' ? '·' : fmt(elemOf(it.type), x).replace(/^'(.*)'$/, '$1'))).join(' ');
+    return fmt(el, it);
+  }
+
   function viewValue(type, v) {
     if (isRefValue(v) && (v.kind === 'array' || v.kind === 'list')) {
       const el = v.kind === 'list' ? v.elem : elemOf(v.type);
       return {
         value: `${v.items.length} case${v.items.length > 1 ? 's' : ''}`,
-        array: v.items.map((it, i) => ({ value: fmt(el, it), changed: changed.has(`${v.id}:${i}`) })),
+        array: v.items.map((it, i) => ({ value: cellText(el, it), changed: changed.has(`${v.id}:${i}`) || (it?.kind === 'array' && it.items.some((_, j) => changed.has(`${it.id}:${j}`))) })),
       };
     }
     if (isRefValue(v) && v.kind === 'object') {
@@ -128,7 +134,7 @@ export function execute(program, { world, api = {} }) {
             // un tableau ou une liste rangé dans un attribut s'affiche aussi en cases
             if (isRefValue(fv) && (fv.kind === 'array' || fv.kind === 'list')) {
               const el = fv.kind === 'list' ? fv.elem : elemOf(fv.type);
-              field.array = fv.items.map((it, i) => ({ value: fmt(el, it), changed: changed.has(`${fv.id}:${i}`) }));
+              field.array = fv.items.map((it, i) => ({ value: cellText(el, it), changed: changed.has(`${fv.id}:${i}`) || (it?.kind === 'array' && it.items.some((_, j) => changed.has(`${it.id}:${j}`))) }));
               if (changed.has(`${fv.id}:removed`) || field.array.some((c) => c.changed)) field.changed = true;
             }
             return field;
@@ -253,10 +259,11 @@ export function execute(program, { world, api = {} }) {
     }
   }
 
-  function makeArray(type, size, line) {
+  function makeArray(type, sizes, line) {
+    const [size, ...rest] = Array.isArray(sizes) ? sizes : [sizes];
     if (size < 0) throw runtimeError(`NegativeArraySizeException : un tableau ne peut pas avoir ${size} cases.`, line);
     if (size > 10000) throw runtimeError('Tableau trop grand pour Java Quest (10 000 cases au maximum).', line);
-    return newArray(type, Array.from({ length: size }, () => defaultValue(elemOf(type))));
+    return newArray(type, Array.from({ length: size }, () => (rest.length ? makeArray(elemOf(type), rest, line) : defaultValue(elemOf(type)))));
   }
 
   function checkIndex(arr, i, line) {
@@ -367,7 +374,7 @@ export function execute(program, { world, api = {} }) {
         return arr.items[i];
       }
       case 'ArrayLit': return arrayLit(e, e.arrayType);
-      case 'NewArray': return makeArray(e.arrayType, evalExpr(e.size), e.line);
+      case 'NewArray': return makeArray(e.arrayType, (e.sizes ?? [e.size]).map(evalExpr), e.line);
       case 'New':
         if (e.st && isList(e.st) || e.st === 'ArrayList<?>') return newList(e.st);
         return construct(e);
@@ -650,7 +657,7 @@ export function execute(program, { world, api = {} }) {
       case 'equalsIgnoreCase': return a !== null && s.toLowerCase() === a.toLowerCase();
       case 'isEmpty': return s.length === 0;
       case 'contains': return s.includes(a);
-      case 'indexOf': return s.indexOf(a);
+      case 'indexOf': return s.indexOf(e.charArg ? String.fromCharCode(a) : a);
       case 'startsWith': return s.startsWith(a);
       case 'endsWith': return s.endsWith(a);
       case 'trim': return s.trim();

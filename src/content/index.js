@@ -10,6 +10,7 @@ import m9 from './missions/m9-poo.js';
 import m10 from './missions/m10-combinee.js';
 import banque from './projects/banque.js';
 import depenses from './projects/depenses.js';
+import jeux from './projects/jeux.js';
 
 // Catalogue des missions. Pour ajouter une mission jouable : créer un fichier dans missions/ et l'ajouter ici.
 
@@ -18,7 +19,7 @@ import depenses from './projects/depenses.js';
 export const PROJECTS = [
   banque,
   depenses,
-  { id: 'jeux', title: 'Pendu ou Morpion', summary: 'Programmer la logique complète d\'un jeu classique.' },
+  jeux,
   { id: 'gestion', title: 'Gestion des employés', summary: 'Classes Employe et Departement, listes, salaires et moyennes.' },
 ].map((p) => (p.levels ? p : { ...p, levels: [], upcoming: true }));
 

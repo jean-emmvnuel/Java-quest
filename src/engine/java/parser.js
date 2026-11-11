@@ -582,11 +582,19 @@ export function parse(tokens) {
         if (!isOp('{')) throw compileError('Il faut soit une taille (new int[5]), soit des valeurs (new int[]{1, 2}).', tok.line);
         return parseArrayLit(type);
       }
-      const size = parseExpression();
+      const sizes = [parseExpression()];
       expectOp(']');
       let type = `${typeTok.v}[]`;
-      while (isOp('[') && isOp(']', 1)) { next(); next(); type += '[]'; }
-      return { type: 'NewArray', elemType: type.slice(0, -2), arrayType: type, size, line: tok.line };
+      // Tableau à plusieurs dimensions : new char[3][3]
+      while (isOp('[')) {
+        next();
+        if (isOp(']')) { next(); type += '[]'; continue; }
+        if (sizes.length < type.split('[]').length - 1) throw compileError('Les tailles se donnent dans l\'ordre : new int[3][4] (ou new int[3][]).', tok.line);
+        sizes.push(parseExpression());
+        expectOp(']');
+        type += '[]';
+      }
+      return { type: 'NewArray', elemType: type.slice(0, -2), arrayType: type, size: sizes[0], sizes, line: tok.line };
     }
     if (typeTok.t === 'kw') throw compileError(`new ${typeTok.v} : un type de base ne se crée pas avec new (sauf un tableau : new ${typeTok.v}[5]).`, tok.line);
     let typeArg = null;

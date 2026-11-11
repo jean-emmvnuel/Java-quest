@@ -63,6 +63,14 @@ export const OBJECT_TYPES = {
       vider: { params: [], ret: 'void', doc: 'efface tout le contenu du fichier' },
     },
   },
+  partie: {
+    type: 'Partie',
+    methods: {
+      mot: { params: [], ret: 'String', doc: 'le mot secret de la partie de pendu' },
+      lettres: { params: [], ret: 'char[]', doc: 'les lettres proposées par le joueur, dans l\'ordre' },
+      coups: { params: [], ret: 'int[]', doc: 'les coups joués au morpion : ligne, colonne, ligne, colonne…' },
+    },
+  },
   leviers: {
     type: 'Leviers',
     methods: {
@@ -155,6 +163,11 @@ export const API = {
     },
     lignes(w) { return { value: [...w.fichier], desc: `Lecture du fichier depenses.txt : ${w.fichier.length} ligne${w.fichier.length > 1 ? 's' : ''}.` }; },
     vider(w) { w.fichier = []; return { desc: 'Le fichier depenses.txt est vidé.' }; },
+  },
+  partie: {
+    mot(w) { return { value: w.mot, desc: 'La partie choisit un mot secret.' }; },
+    lettres(w) { return { value: [...w.lettres], desc: `Le joueur propose ${w.lettres.length} lettres.` }; },
+    coups(w) { return { value: [...w.coups], desc: `${w.coups.length / 2} coups sont joués.` }; },
   },
   leviers: {
     activer(w, [n]) {

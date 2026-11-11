@@ -158,5 +158,12 @@ expectOut('System.out.println("a,b,,".split(",").length + " " + "x y".replace(" 
 expectError('int n = Integer.parseInt("douze");', /NumberFormatException/);
 expectError('double d = Double.valueOf("1");', /pas disponible/);
 
+
+console.log('\nTableaux 2D et caractères');
+expectOut("char[][] g = new char[3][3]; for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) g[i][j] = '.'; g[1][2] = 'X'; System.out.println(\"\" + g[1][0] + g[1][2] + g.length + g[0].length);", '.X33\n');
+expectOut("int[][] t = {{1, 2}, {3, 4}}; int s = 0; for (int[] l : t) for (int x : l) s += x; System.out.println(s);", '10\n');
+expectOut("String m = \"JAVA\"; System.out.println(m.indexOf('V') + \" \" + m.indexOf('Z') + \" \" + m.indexOf(\"AV\"));", '2 -1 1\n');
+expectOut("String t = \"\"; t += 'A'; t += 'B'; System.out.println(t);", 'AB\n');
+
 console.log(failures ? `\n${failures} échec(s)` : '\nTout est vert.');
 process.exit(failures ? 1 : 0);

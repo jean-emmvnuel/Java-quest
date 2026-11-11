@@ -19,6 +19,7 @@ export function createWorld(def) {
     cols, rows, walls: [], robot: null, goal: null, chest: null, door: null, terminal: null, sensor: null, lever: null,
     badge: def.badge ?? false, energy: def.energy ?? 100, bumped: null, alarm: false, visited: [],
     notes: def.notes ?? [], prix: def.prix ?? [], poids: def.poids ?? [], fichier: def.fichier ? [...def.fichier] : [],
+    mot: def.mot ?? 'JAVA', lettres: [...(def.lettres ?? '')].map((c) => c.charCodeAt(0)), coups: def.coups ?? [],
   };
   def.map.forEach((row, y) => {
     [...row].forEach((ch, x) => {

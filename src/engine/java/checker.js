@@ -534,8 +534,10 @@ export function check(program, objects = {}) {
         return checkArrayLit(e, e.arrayType);
       case 'NewArray': {
         validType(e.arrayType, e.line);
-        const t = expr(e.size);
-        if (t !== 'int' && t !== 'char') throw compileError(`La taille d'un tableau doit être un int, pas un ${t}.`, e.line);
+        for (const sz of e.sizes ?? [e.size]) {
+          const t = expr(sz);
+          if (t !== 'int' && t !== 'char') throw compileError(`La taille d'un tableau doit être un int, pas un ${t}.`, e.line);
+        }
         return e.arrayType;
       }
       case 'New': {
@@ -851,6 +853,12 @@ export function check(program, objects = {}) {
       if (!m) {
         const guess = closest(e.name, Object.keys(STRING_METHODS));
         throw compileError(`Un String n'a pas de méthode ${e.name}().`, e.line, guess ? `Voulais-tu écrire ${guess}() ?` : undefined);
+      }
+      // indexOf accepte aussi un caractère : mot.indexOf('A')
+      if (e.name === 'indexOf' && e.args.length === 1 && expr(e.args[0]) === 'char') {
+        e.kind = 'string';
+        e.charArg = true;
+        return 'int';
       }
       checkParams(e, e.name, m.params, m.optional);
       e.kind = 'string';
