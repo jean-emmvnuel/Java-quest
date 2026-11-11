@@ -126,7 +126,7 @@ svg { display: block; }
 .code-card { overflow: hidden; box-shadow: 0 6px 0 var(--line); }
 .code-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 3px solid var(--line); background: #f8faff; }
 .file-tab { font: 700 14px var(--mono); color: var(--ink-2); }
-.run-status { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font: 700 13px var(--font-display); color: var(--ink-3); }
+.run-status { border: 0; background: none; cursor: pointer; padding: 4px 6px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font: 700 13px var(--font-display); color: var(--ink-3); }
 .run-status::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
 .run-status.ok { color: var(--green-ink); }
 .run-status.ko { color: var(--coral-ink); }

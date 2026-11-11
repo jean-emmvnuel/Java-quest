@@ -16,9 +16,11 @@ import SuccessDialog from './ui/feedback/SuccessDialog.jsx';
 import MissionMap from './ui/missions/MissionMap.jsx';
 import Mascot from './ui/common/Mascot.jsx';
 import Icon from './ui/common/Icon.jsx';
+import Rich from './ui/common/Rich.jsx';
 import MissionProgress from './ui/lesson/MissionProgress.jsx';
 import { isSoundOn, setSound, playTap } from './ui/feedback/sound.js';
 import { reportVisit } from './services/visits.js';
+import MobileTabs from './ui/mobile/MobileTabs.jsx';
 
 /**
  * Explication de ce qui ne va pas — affichée seulement si l'élève la demande
@@ -48,6 +50,10 @@ export default function App() {
   const [win, setWin] = useState(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(isSoundOn);
+  // Téléphone : une seule section visible à la fois (Consigne, Code ou Résultat)
+  const [tab, setTab] = useState('lesson');
+  const [seenRun, setSeenRun] = useState(0);
+  const [typingFocus, setTypingFocus] = useState(false);
 
   // Toute nouvelle frappe referme l'aide : on laisse l'élève écrire tranquillement
   useEffect(() => { setHelpOpen(false); }, [code]);
@@ -56,7 +62,8 @@ export default function App() {
   useEffect(() => { reportVisit(`${level.id} ${level.title}`); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Changement de niveau : on revient à la première situation
-  useEffect(() => { setPreview(0); setWin(null); }, [level]);
+  useEffect(() => { setPreview(0); setWin(null); setTab('lesson'); }, [level]);
+  useEffect(() => { if (tab === 'result') setSeenRun(runId); }, [tab, runId]);
 
   // Réussite : on enregistre les étoiles et on fête ça
   useEffect(() => {
@@ -93,6 +100,13 @@ export default function App() {
   const solved = !!progress.stars[level.id];
   const runtimeError = pb.run?.error && current?.kind === 'error' ? pb.run.error : null;
 
+  let stageStatus = 'idle';
+  if (pb.run) {
+    if (!pb.finished) stageStatus = 'playing';
+    else if (result.passed) stageStatus = 'passed';
+    else stageStatus = pb.run.error ? 'error' : 'failed';
+  }
+
   let status = { cls: '', text: 'À toi de jouer' };
   if (typing || stale) status = { cls: 'busy', text: 'Tu écris…' };
   else if (pb.playing) status = { cls: '', text: 'Exécution' };
@@ -101,7 +115,7 @@ export default function App() {
   const goTo = (id) => { playTap(); progress.goTo(id); setMapOpen(false); };
 
   return (
-    <div className="app">
+    <div className={`app ${typingFocus ? 'kbd-open' : ''}`}>
       <TopBar
         level={level}
         levelIndex={levelIndex}
@@ -117,8 +131,9 @@ export default function App() {
         onOpenMap={() => setMapOpen(true)}
       />
 
-      <main className="layout level-enter" key={level.id}>
+      <main className="layout level-enter" key={level.id} data-tab={tab}>
         <div className="col">
+          <div className="pane pane-lesson">
           <MissionProgress mission={level.mission} currentId={level.id} stars={progress.stars} onPick={goTo} />
           <div className="title-block">
             <p className="eyebrow">{level.mission.place}</p>
@@ -132,19 +147,24 @@ export default function App() {
             onHint={progress.useHint}
             onSolution={progress.showSolution}
           />
+          <button className="btn btn-blue mobile-only pane-next" onClick={() => setTab('code')} type="button">
+            J'écris mon code <Icon name="right" />
+          </button>
+          </div>
 
+          <div className="pane pane-code">
           <section className="panel code-card">
             <div className="code-head">
               <span className="file-tab">Main.java</span>
-              <span className={`run-status ${status.cls}`}>{status.text}</span>
+              <button className={`run-status ${status.cls}`} onClick={() => setTab('result')} type="button">{status.text}</button>
             </div>
-            <CodeEditor value={code} onChange={progress.setCode} activeLine={activeLine} errorLine={errorLine} frame={level.frame ?? MAIN_FRAME} />
+            <CodeEditor value={code} onChange={progress.setCode} activeLine={activeLine} errorLine={errorLine} frame={level.frame ?? MAIN_FRAME} onFocusChange={setTypingFocus} />
             <div className="code-foot">
               <button className="btn btn-ghost" onClick={pb.restart} disabled={!pb.run} type="button">
-                <Icon name="replay" /> Rejouer
+                <Icon name="replay" /> <span className="btn-label">Rejouer</span>
               </button>
               <button className="btn btn-ghost" onClick={pb.stepMode} disabled={!pb.run} type="button">
-                <Icon name="step" /> Pas à pas
+                <Icon name="step" /> <span className="btn-label">Pas à pas</span>
               </button>
               <span className="spacer" />
               <button
@@ -157,9 +177,29 @@ export default function App() {
               </button>
             </div>
           </section>
+          {pb.run && (
+            <button className={`mini-result mobile-only mini-${stageStatus}`} onClick={() => setTab('result')} type="button">
+              <span className="mini-head">
+                <span className="mini-status">{{ playing: '▶ Exécution', passed: '✓ Réussi', failed: '✗ À corriger', error: '! Erreur' }[stageStatus] ?? '…'}</span>
+                <span className="mini-step">{pb.step + 1}/{pb.steps.length}</span>
+              </span>
+              <span className="mini-bar"><span style={{ width: `${pb.steps.length > 1 ? (pb.step / (pb.steps.length - 1)) * 100 : 0}%` }} /></span>
+              <Rich text={current?.desc ?? ''} className="mini-desc" />
+              {current?.out && <span className="mini-out">{current.out.trim().split('\n').pop()}</span>}
+              <span className="mini-cta">Voir le résultat <Icon name="right" size={16} /></span>
+            </button>
+          )}
+          {canHelp && !helpOpen && (
+            <button className="help-btn mobile-only" onClick={() => setHelpOpen(true)} type="button">
+              <Mascot mood="think" size={34} />
+              Pourquoi ça ne marche pas ?
+            </button>
+          )}
+          {canHelp && helpOpen && <div className="mobile-only"><Feedback state={help} /></div>}
+          </div>
         </div>
 
-        <div className="col col-right">
+        <div className="col col-right pane pane-result">
           <Stage
             world={world}
             tests={level.tests}
@@ -168,6 +208,11 @@ export default function App() {
             onPickTest={(i) => (pb.run ? pb.showRun(i) : setPreview(i))}
             moveMs={Math.round(Math.min(380, SPEEDS[pb.speed] * 0.85))}
             sceneKey={`${level.id}-${testIndex}`}
+            status={stageStatus}
+            progress={pb.steps.length > 1 ? pb.step / (pb.steps.length - 1) : 0}
+            event={current?.event}
+            stepKey={pb.step}
+            error={runtimeError}
           />
 
           {canHelp && !helpOpen && (
@@ -194,6 +239,13 @@ export default function App() {
           )}
         </div>
       </main>
+
+      <MobileTabs
+        tab={tab}
+        onChange={(t) => { playTap(); setTab(t); window.scrollTo({ top: 0 }); }}
+        badge={!!result && runId !== seenRun && tab !== 'result'}
+        resultTone={stageStatus === 'passed' ? 'ok' : stageStatus === 'failed' || stageStatus === 'error' ? 'ko' : null}
+      />
 
       <MissionMap open={mapOpen} onClose={() => setMapOpen(false)} currentId={level.id} stars={progress.stars} onPick={goTo} />
 

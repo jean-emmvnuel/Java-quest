@@ -1,4 +1,5 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import SymbolBar from '../mobile/SymbolBar.jsx';
 import { highlight } from './highlight.js';
 import { MAIN_FRAME } from '../../engine/index.js';
 import './editor.css';
@@ -15,7 +16,9 @@ function Line({ segs }) {
  * ou bien le main qui utilise ta méthode / ta classe — et l'élève écrit dans la zone jaune.
  * Les numéros de ligne sont ceux du vrai fichier Main.java.
  */
-export default function CodeEditor({ value, onChange, activeLine, errorLine, frame = MAIN_FRAME }) {
+export default function CodeEditor({ value, onChange, activeLine, errorLine, frame = MAIN_FRAME, onFocusChange }) {
+  const [focused, setFocused] = useState(false);
+  const touch = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 720px), (pointer: coarse)').matches;
   const HEADER = frame.before;
   const FOOTER = frame.after;
   const FIRST_LINE = HEADER.length + 1;
@@ -33,6 +36,16 @@ export default function CodeEditor({ value, onChange, activeLine, errorLine, fra
     onChange(next);
     requestAnimationFrame(() => ta.current?.setSelectionRange(caret, caret));
   }
+
+  /** Insère un texte à la place de la sélection (barre de symboles du téléphone). */
+  function insert(text) {
+    const el = ta.current;
+    if (!el) return;
+    const { selectionStart: s, selectionEnd: t } = el;
+    edit(value.slice(0, s) + text + value.slice(t), s + text.length);
+  }
+
+  const focusChange = (on) => { setFocused(on); onFocusChange?.(on); };
 
   // Petites aides de saisie : tabulation, indentation automatique, accolades
   function onKeyDown(e) {
@@ -104,6 +117,8 @@ export default function CodeEditor({ value, onChange, activeLine, errorLine, fra
               autoCorrect="off"
               wrap="off"
               rows={userLines.length}
+              onFocus={() => focusChange(true)}
+              onBlur={() => focusChange(false)}
               aria-label="Ton code Java, à l'intérieur de la méthode main"
             />
           </div>
@@ -112,6 +127,7 @@ export default function CodeEditor({ value, onChange, activeLine, errorLine, fra
           </div>
         </div>
       </div>
+      <SymbolBar visible={focused && touch} onKey={insert} />
     </div>
   );
 }

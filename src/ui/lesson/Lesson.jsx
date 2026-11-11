@@ -7,7 +7,8 @@ import './lesson.css';
 
 /** La consigne : Bit raconte la situation, puis l'objectif, la notion, les objets et les indices. */
 export default function Lesson({ level, hintsUsed, onHint, onSolution }) {
-  const [notionOpen, setNotionOpen] = useState(true);
+  // Sur téléphone, la notion est repliée au départ pour garder la consigne courte
+  const [notionOpen, setNotionOpen] = useState(() => !(typeof window !== 'undefined' && window.matchMedia?.('(max-width: 720px)').matches));
   return (
     <section className="lesson" aria-label="Consigne">
       <div className="bubble-row">

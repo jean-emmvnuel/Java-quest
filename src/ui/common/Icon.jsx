@@ -12,6 +12,7 @@ const PATHS = {
   bulb: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z',
   map: 'M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14',
   book: 'M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5zM4 19a2 2 0 0 1 2-2h13',
+  code: 'M8 7 3 12l5 5M16 7l5 5-5 5M13.5 5l-3 14',
 };
 
 export default function Icon({ name, size = 18, className = '' }) {

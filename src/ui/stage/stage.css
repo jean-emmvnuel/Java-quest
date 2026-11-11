@@ -1,10 +1,19 @@
+/* ==========================================================================
+   Vue de résultat : la scène animée et l'écran de la console
+   ========================================================================== */
+
 .stage {
+  position: relative;
   border-radius: var(--r-xl);
   background: var(--surface);
   border: 3px solid var(--line);
   box-shadow: 0 6px 0 var(--line), var(--shadow);
   overflow: hidden;
+  transition: border-color 300ms ease, box-shadow 300ms ease;
 }
+.stage-passed { border-color: #9be3bb; box-shadow: 0 6px 0 #9be3bb, var(--shadow); }
+.stage-failed, .stage-error { border-color: #ffd28a; box-shadow: 0 6px 0 #ffd28a, var(--shadow); }
+
 .stage-tabs {
   display: flex;
   align-items: center;
@@ -12,74 +21,157 @@
   padding: 12px 16px;
   border-bottom: 2px solid var(--line);
   overflow-x: auto;
+  scrollbar-width: none;
 }
+.stage-tabs::-webkit-scrollbar { display: none; }
 .stage-tabs-label { font: 700 13px var(--font-display); color: var(--ink-3); white-space: nowrap; }
+
+/* Barre de progression de l'exécution */
+.stage-progress { height: 5px; background: #eef3fb; }
+.stage-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(90deg, var(--blue), #7fb0ff);
+  transition: width 160ms linear;
+}
+.stage-passed .stage-progress span { background: linear-gradient(90deg, var(--green), #6ee0a1); }
+
 .stage-view {
+  position: relative;
   display: grid;
   place-items: center;
-  min-height: 260px;
-  padding: 26px;
+  min-height: 280px;
+  padding: 34px 26px 26px;
+  overflow: hidden;
   background:
-    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.9) 0 40px, transparent 41px),
-    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.7) 0 60px, transparent 61px),
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.95) 0 34px, transparent 35px),
+    radial-gradient(circle at 26% 18%, rgba(255, 255, 255, 0.85) 0 26px, transparent 27px),
+    radial-gradient(circle at 84% 78%, rgba(255, 255, 255, 0.75) 0 52px, transparent 53px),
     linear-gradient(180deg, #dff1ff 0%, #e9fbef 100%);
+  background-size: 140% 100%, 140% 100%, 140% 100%, 100% 100%;
+  animation: clouds 28s ease-in-out infinite alternate;
 }
+.stage-console { background: linear-gradient(180deg, #eaf3ff 0%, #f5fbff 100%); animation: none; }
+
+/* Pastille d'état (en haut à gauche) */
+.stage-badge {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px 3px 4px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid var(--line);
+  font: 700 13px var(--font-display);
+  color: var(--ink-3);
+  animation: badge-in 380ms var(--ease-out) both;
+}
+.stage-badge b {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #eef2f9;
+  font-size: 11px;
+}
+.badge-playing { color: var(--blue-ink); border-color: #b9cff8; }
+.badge-playing b { background: var(--blue); color: #fff; animation: pulse-dot 1s ease-in-out infinite; }
+.badge-passed { color: var(--green-ink); border-color: #9be3bb; }
+.badge-passed b { background: var(--green); color: #fff; }
+.badge-failed, .badge-error { color: #9a6700; border-color: #ffd28a; }
+.badge-failed b, .badge-error b { background: var(--yellow); color: #fff; }
+
 .scene { width: 100%; max-width: 560px; max-height: 340px; height: auto; overflow: visible; }
 
+/* ---------- Sol, caisses, traces ---------- */
 .tile { fill: #fffdf6; stroke: #efe6d2; stroke-width: 2; }
 .tile-b { fill: #fbf6ea; }
-.trail { fill: var(--blue); opacity: 0.35; }
+.trail { fill: var(--blue); opacity: 0.35; transform-box: fill-box; transform-origin: center; animation: trail-pop 420ms var(--ease-out) both; }
 
 .crate-side { fill: #b9814f; }
 .crate-top { fill: #e0a96d; stroke: #c98d55; stroke-width: 2; }
 .crate-plank { stroke: #c98d55; stroke-width: 3; stroke-linecap: round; }
 
+/* ---------- Sortie ---------- */
 .goal-pad { fill: #c9f5dc; stroke: var(--green); stroke-width: 3; stroke-dasharray: 6 6; animation: pad-pulse 1.6s ease-in-out infinite; }
 .goal-pole { stroke: #3b4a6b; stroke-width: 3; stroke-linecap: round; }
-.goal-flag { fill: var(--coral); }
-.goal.reached .goal-pad { stroke-dasharray: none; fill: #8fe3b4; animation: none; }
+.goal-flag { fill: var(--coral); transform-box: fill-box; transform-origin: left center; animation: flag-wave 1.2s ease-in-out infinite; }
+.goal.reached .goal-pad { stroke-dasharray: none; fill: #8fe3b4; animation: goal-glow 900ms var(--ease-out) both; }
+.goal.reached .goal-flag { fill: var(--green); }
 
+/* ---------- Particules ---------- */
+.particle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: particle-fly 900ms var(--d, 0ms) cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+.burst-goal .particle:nth-child(3n) { fill: var(--yellow); }
+.burst-goal .particle:nth-child(3n + 1) { fill: var(--green); }
+.burst-goal .particle:nth-child(3n + 2) { fill: var(--blue); }
+.burst-gold .particle { fill: var(--yellow); }
+
+/* ---------- Robot ---------- */
 .robot-pos { transition: transform var(--move, 380ms) var(--ease-out); }
-.robot-rot { transition: transform var(--move, 340ms) var(--ease-out); }
+.robot-rot { transition: transform var(--move, 340ms) cubic-bezier(0.34, 1.4, 0.64, 1); }
+.robot-hop { animation: hop var(--move, 380ms) var(--ease-out); }
+.robot-idle { animation: idle-bob 2.4s ease-in-out infinite; }
 .robot-shadow { fill: rgba(31, 42, 68, 0.14); }
 .robot-body { fill: var(--blue); }
 .robot-shine { fill: #fff; opacity: 0.18; }
 .robot-face { fill: #fff; }
 .robot-eye { fill: var(--ink); }
+.robot-eyes { transform-box: fill-box; transform-origin: center; animation: blink 4.5s infinite; }
 .robot-nose { fill: var(--yellow); }
-.robot-bump { animation: bump 420ms var(--ease-out); }
+.robot-bump { animation: bump 460ms var(--ease-out); }
 .robot-bump .robot-body { fill: var(--coral); }
 .battery-bg { fill: #dfe5f0; }
 .battery { fill: var(--green); }
-.battery-low { fill: var(--coral); }
+.battery-low { fill: var(--coral); animation: pulse-dot 900ms ease-in-out infinite; }
 
+.puff-dot { fill: #d9cbb3; animation: puff 600ms ease-out both; }
+.bump-text { font: 800 14px var(--font-display); fill: var(--coral-ink); text-anchor: middle; animation: pop-up 900ms var(--ease-out) both; }
+
+/* ---------- Coffre ---------- */
 .chest-body { fill: #6b7a99; }
 .chest-front { fill: #93a1bd; }
 .chest-dial { fill: #e8edf6; stroke: #4a5878; stroke-width: 2.5; }
-.chest-needle { stroke: #2b3550; stroke-width: 2.5; stroke-linecap: round; }
+.chest-needle { stroke: #2b3550; stroke-width: 2.5; stroke-linecap: round; transform-box: view-box; }
 .chest-led { fill: var(--coral); }
-.chest-door { transform-box: fill-box; transform-origin: left center; transition: transform 520ms var(--ease); }
+.chest-door { transform-box: fill-box; transform-origin: left center; transition: transform 620ms cubic-bezier(0.34, 1.5, 0.64, 1); }
 .chest.is-open .chest-door { transform: translateX(-3px) scaleX(0.25); }
-.chest.is-open .chest-body { fill: var(--yellow); }
+.chest.is-open .chest-body { fill: var(--yellow); transition: fill 300ms ease; }
 .chest.is-open .chest-led { fill: var(--green); }
-.chest-coins { font: 800 22px var(--font-display); fill: #a86b00; text-anchor: middle; animation: pop 400ms var(--ease-out); }
-.chest.is-wrong:not(.is-open) .chest-door { animation: shake 360ms var(--ease-out); }
+.coin { animation: coin-float 1.4s calc(var(--i) * 120ms) var(--ease-out) both; }
+.coin-face { fill: #ffd34d; stroke: #d9a300; stroke-width: 2; }
+.coin-mark { font: 800 9px var(--font-display); fill: #9a6700; text-anchor: middle; }
+.deny { transform-box: fill-box; transform-origin: center; animation: deny-pop 700ms var(--ease-out) both; }
+.deny-ring { fill: rgba(255, 107, 94, 0.18); stroke: var(--coral); stroke-width: 3; }
+.deny-x { stroke: var(--coral); stroke-width: 4; stroke-linecap: round; }
 
-.door-frame { fill: #fff; stroke: #8e9ab3; stroke-width: 3; }
-.door-panel { transform-box: fill-box; transform-origin: top center; transition: transform 450ms var(--ease), opacity 450ms ease; }
+/* ---------- Porte ---------- */
+.door-frame { fill: #fff; stroke: #8e9ab3; stroke-width: 3; transition: stroke 300ms ease; }
+.door-panel { transform-box: fill-box; transform-origin: top center; transition: transform 650ms cubic-bezier(0.34, 1.4, 0.64, 1), opacity 450ms ease; }
 .door-fill { fill: #ffe1b3; stroke: var(--orange); stroke-width: 2.5; }
 .door-bar { stroke: var(--orange); stroke-width: 3; stroke-linecap: round; }
 .door.is-open .door-panel { transform: scaleY(0.1); opacity: 0.5; }
 .door.is-open .door-frame { stroke: var(--green); }
 
+/* ---------- Terminal, thermostat, leviers ---------- */
 .terminal-body { fill: #5b6b8c; }
-.terminal-screen { fill: #dfe7f5; transition: fill 300ms ease; }
+.terminal-screen { fill: #dfe7f5; }
+.terminal.is-on .terminal-screen { fill: #d6fbe5; animation: screen-flash 500ms ease-out; }
 .terminal-foot { fill: #8e9ab3; }
 .terminal-text { font: 700 9px var(--mono); fill: #8e9ab3; text-anchor: middle; }
-.terminal.is-on .terminal-screen { fill: #d6fbe5; }
 .terminal.is-on .terminal-text { fill: #1a8a4e; }
 
 .sensor-ring { fill: #fff; stroke: #c6d0e2; stroke-width: 4; }
+.sensor-face { transform-box: fill-box; transform-origin: center; animation: breathe 2.6s ease-in-out infinite; }
 .sensor-face.cold { fill: #cfe6ff; }
 .sensor-face.mild { fill: #c9f5dc; }
 .sensor-face.hot { fill: #ffd2cc; }
@@ -90,18 +182,118 @@
 .lever.on-1 { fill: var(--orange); }
 .lever.on-2 { fill: var(--green); }
 .lever.on-3 { fill: var(--blue); }
-.lever-knob { fill: #fff; stroke: rgba(31, 42, 68, 0.2); stroke-width: 1.5; transition: cy 300ms var(--ease-out); }
+.lever-knob { fill: #fff; stroke: rgba(31, 42, 68, 0.2); stroke-width: 1.5; transition: cy 420ms cubic-bezier(0.34, 1.6, 0.64, 1); }
 .lever-label { font: 800 9px var(--font-display); fill: var(--ink-3); text-anchor: middle; }
+.lever-halo { transform-box: fill-box; transform-origin: center; animation: halo 900ms ease-out both; }
+.halo-1 { fill: rgba(255, 159, 46, 0.35); }
+.halo-2 { fill: rgba(47, 191, 113, 0.35); }
+.halo-3 { fill: rgba(79, 140, 255, 0.35); }
 
+/* ==========================================================================
+   Écran de la console (niveaux sans robot)
+   ========================================================================== */
+.screen {
+  position: relative;
+  width: min(520px, 100%);
+  border-radius: 22px;
+  background: #fff;
+  border: 4px solid #cfdcf3;
+  box-shadow: 0 8px 0 #cfdcf3, 0 18px 40px rgba(31, 42, 68, 0.1);
+  animation: screen-in 520ms var(--ease) both;
+}
+.screen-passed { border-color: #9be3bb; box-shadow: 0 8px 0 #9be3bb, 0 18px 40px rgba(47, 191, 113, 0.15); }
+.screen-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 3px solid #eef3fb; }
+.screen-dot { width: 11px; height: 11px; border-radius: 50%; background: #ff8b80; }
+.screen-dot:nth-child(2) { background: #ffd166; }
+.screen-dot:nth-child(3) { background: #6ee0a1; }
+.screen-title { margin-left: 8px; font: 700 13px var(--font-display); color: var(--ink-3); }
+.screen-body {
+  min-height: 150px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 14px 18px 22px;
+  font: 600 17px/1.6 var(--mono);
+  color: var(--ink);
+}
+.screen-wait { margin: 0; color: var(--ink-4); font-weight: 500; }
+.screen-line { display: flex; align-items: center; animation: line-in 260ms var(--ease-out) both; }
+.screen-text {
+  display: inline-block;
+  max-width: calc(var(--n) * 1ch + 0.5em);
+  overflow: hidden;
+  white-space: pre;
+  vertical-align: bottom;
+  animation: type calc(var(--n) * 28ms + 80ms) steps(var(--n), end) both;
+}
+.screen-error { color: var(--coral-ink); white-space: normal; }
+.screen-error .screen-text { white-space: normal; max-width: none; animation: none; }
+.caret {
+  display: inline-block;
+  width: 0.6ch;
+  height: 1.1em;
+  margin-left: 2px;
+  border-radius: 2px;
+  background: var(--blue);
+  vertical-align: middle;
+  animation: caret 1s steps(1) infinite;
+}
+.screen-bit {
+  position: absolute;
+  right: -10px;
+  bottom: -18px;
+  filter: drop-shadow(0 4px 6px rgba(31, 42, 68, 0.18));
+  transition: transform 300ms var(--ease-out);
+}
+.bit-playing { animation: idle-bob 1.4s ease-in-out infinite; }
+.bit-passed { animation: celebrate 900ms var(--ease-out) 2; }
+.bit-failed, .bit-error { animation: shake 500ms var(--ease-out) 1; }
+
+/* ==========================================================================
+   Images clés
+   ========================================================================== */
+@keyframes clouds { to { background-position: 30% 0, 40% 0, -30% 0, 0 0; } }
+@keyframes badge-in { from { opacity: 0; transform: translateY(-8px) scale(0.9); } }
+@keyframes pulse-dot { 50% { transform: scale(0.82); } }
 @keyframes pad-pulse { 50% { stroke-dashoffset: 6; opacity: 0.75; } }
+@keyframes flag-wave { 50% { transform: skewY(-10deg) scaleX(0.9); } }
+@keyframes goal-glow { 0% { transform: scale(0.8); } 60% { transform: scale(1.12); } 100% { transform: none; } }
+@keyframes trail-pop { 0% { transform: scale(0); } 70% { transform: scale(1.6); } 100% { transform: scale(1); } }
+@keyframes particle-fly {
+  0% { transform: rotate(var(--a)) translateY(0) scale(1); opacity: 1; }
+  100% { transform: rotate(var(--a)) translateY(-46px) scale(0.2); opacity: 0; }
+}
+@keyframes hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  30% { transform: translateY(-10px) scale(0.92, 1.08); }
+  70% { transform: translateY(0) scale(1.08, 0.92); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes idle-bob { 50% { transform: translateY(-2.5px); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
 @keyframes bump {
   0%, 100% { transform: translate(0, 0); }
-  25% { transform: translate(6px, 0); }
-  50% { transform: translate(-5px, 0); }
-  75% { transform: translate(2px, 0); }
+  20% { transform: translate(7px, 0) rotate(4deg); }
+  45% { transform: translate(-6px, 0) rotate(-3deg); }
+  70% { transform: translate(3px, 0); }
 }
-@keyframes shake { 30% { transform: translateX(-3px); } 60% { transform: translateX(3px); } }
+@keyframes puff { 0% { transform: rotate(var(--a)) translateY(0) scale(0.4); opacity: 0.9; } 100% { transform: rotate(var(--a)) translateY(-22px) scale(1.4); opacity: 0; } }
+@keyframes pop-up { 0% { opacity: 0; transform: translateY(8px) scale(0.6); } 25% { opacity: 1; transform: translateY(0) scale(1.1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+@keyframes coin-float { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-34px); opacity: 0; } }
+@keyframes deny-pop { 0% { transform: scale(0.4); opacity: 0; } 30% { transform: scale(1.15); opacity: 1; } 80% { opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+@keyframes screen-flash { 0% { fill: #ffffff; } 100% { fill: #d6fbe5; } }
+@keyframes breathe { 50% { transform: scale(1.05); } }
+@keyframes halo { 0% { transform: scale(0.3); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+@keyframes screen-in { from { opacity: 0; transform: translateY(12px) scale(0.97); } }
+@keyframes line-in { from { transform: translateX(-6px); opacity: 0.4; } }
+@keyframes type { from { max-width: 0; } }
+@keyframes caret { 50% { opacity: 0; } }
+@keyframes celebrate { 0%, 100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-16px) rotate(-8deg); } 60% { transform: translateY(0) rotate(6deg); } }
+@keyframes shake { 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-2px); } }
 
-@media (max-width: 640px) {
-  .stage-view { padding: 14px; min-height: 200px; }
+@media (max-width: 720px) {
+  .stage-view { padding: 40px 10px 16px; min-height: 220px; }
+  .scene { max-height: 300px; }
+  .screen-body { font-size: 15px; min-height: 120px; padding: 12px 14px 22px; }
+  .screen-bit { right: -4px; bottom: -14px; }
+  .screen-bit .mascot { width: 52px; height: 52px; }
 }

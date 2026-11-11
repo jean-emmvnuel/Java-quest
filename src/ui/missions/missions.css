@@ -97,7 +97,17 @@
 .project p { margin: 0; font-size: 13px; }
 
 @media (max-width: 640px) {
-  .sheet { top: 70px; border-radius: 22px; }
+  .sheet {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    max-height: calc(100dvh - env(safe-area-inset-top) - 24px);
+    border-radius: 26px 26px 0 0;
+    border-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    transform: translateX(-50%) translateY(40px);
+  }
+  .sheet-root.open .sheet { transform: translateX(-50%) translateY(0); }
   .sheet-head, .sheet-scroll { padding-left: 16px; padding-right: 16px; }
   .project-grid { grid-template-columns: 1fr; }
   .node { width: calc(50% - 5px); }
