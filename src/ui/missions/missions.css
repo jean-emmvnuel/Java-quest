@@ -102,3 +102,5 @@
   .project-grid { grid-template-columns: 1fr; }
   .node { width: calc(50% - 5px); }
 }
+
+.privacy-note { margin: 4px 4px 0; font-size: 12px; line-height: 1.5; color: var(--ink-4); text-align: center; }

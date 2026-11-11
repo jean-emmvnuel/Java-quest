@@ -1,0 +1,17 @@
+# Configuration du Worker « compteur de visiteurs » de Java Quest.
+# Voir worker/README.md pour la mise en place pas à pas.
+name = "java-quest-visites"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+[vars]
+# Adresses autorisées à envoyer le signal de visite (séparées par des virgules).
+# Ajoute ici l'adresse de ton site une fois en ligne, par exemple https://java-quest.pages.dev
+ALLOWED_ORIGINS = "http://localhost:5173,http://localhost:4173"
+# Fuseau horaire utilisé dans les messages Telegram
+TIMEZONE = "Africa/Abidjan"
+
+[[kv_namespaces]]
+binding = "VISITORS"
+# Remplace par l'identifiant affiché par : npx wrangler kv namespace create VISITORS
+id = "REMPLACE_PAR_TON_ID_KV"

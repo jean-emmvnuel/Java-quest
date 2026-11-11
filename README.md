@@ -42,3 +42,7 @@ Le code s'exécute **automatiquement et en silence** : pendant la frappe rien ne
 ## Ajouter un niveau
 
 Dans `src/content/missions/`, ajoute un objet à la liste `levels` d'une mission : `story`, `goal`, `notion`, `objects`, `starter`, `solution`, `hints`, `tests` (une carte ASCII par situation) et `check(run)` qui renvoie `null` si c'est réussi, ou un message sinon. Lance `npm test`.
+
+## Suivi des visites (optionnel)
+
+Un petit Worker Cloudflare t'envoie un message Telegram à chaque nouveau visiteur (adresse IP jamais stockée ni transmise : seulement ville et pays). Mise en place pas à pas : [worker/README.md](worker/README.md).

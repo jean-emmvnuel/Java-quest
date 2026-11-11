@@ -47,6 +47,11 @@ export default function MissionMap({ open, onClose, currentId, stars, onPick }) 
               ))}
             </div>
           </section>
+
+          <p className="privacy-note">
+            Java Quest compte ses visiteurs de façon anonyme : seuls la ville et le pays sont notés,
+            jamais ton adresse IP ni ton code. Ta progression reste uniquement sur cet appareil.
+          </p>
         </div>
       </div>
     </div>

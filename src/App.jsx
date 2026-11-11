@@ -18,6 +18,7 @@ import Mascot from './ui/common/Mascot.jsx';
 import Icon from './ui/common/Icon.jsx';
 import MissionProgress from './ui/lesson/MissionProgress.jsx';
 import { isSoundOn, setSound, playTap } from './ui/feedback/sound.js';
+import { reportVisit } from './services/visits.js';
 
 /**
  * Explication de ce qui ne va pas — affichée seulement si l'élève la demande
@@ -50,6 +51,9 @@ export default function App() {
 
   // Toute nouvelle frappe referme l'aide : on laisse l'élève écrire tranquillement
   useEffect(() => { setHelpOpen(false); }, [code]);
+
+  // Signal de visite anonyme (une fois par jour au maximum, voir services/visits.js)
+  useEffect(() => { reportVisit(`${level.id} ${level.title}`); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Changement de niveau : on revient à la première situation
   useEffect(() => { setPreview(0); setWin(null); }, [level]);
