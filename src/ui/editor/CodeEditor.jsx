@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { highlight } from './highlight.js';
-import { HEADER, FOOTER, FIRST_LINE } from '../../engine/index.js';
+import { MAIN_FRAME } from '../../engine/index.js';
 import './editor.css';
 
 const INDENT = '    ';
@@ -11,15 +11,19 @@ function Line({ segs }) {
 }
 
 /**
- * Éditeur de code : la classe Main et la méthode main sont fixes (grisées),
- * l'élève écrit seulement le corps de main. Les numéros de ligne sont ceux du vrai fichier Main.java.
+ * Éditeur de code : le « cadre » du niveau est fixe (grisé) — la classe Main et main,
+ * ou bien le main qui utilise ta méthode / ta classe — et l'élève écrit dans la zone jaune.
+ * Les numéros de ligne sont ceux du vrai fichier Main.java.
  */
-export default function CodeEditor({ value, onChange, activeLine, errorLine }) {
+export default function CodeEditor({ value, onChange, activeLine, errorLine, frame = MAIN_FRAME }) {
+  const HEADER = frame.before;
+  const FOOTER = frame.after;
+  const FIRST_LINE = HEADER.length + 1;
   const ta = useRef(null);
   const userLines = value.split('\n');
   const hl = useMemo(() => highlight(value), [value]);
-  const head = useMemo(() => highlight(HEADER.join('\n')), []);
-  const foot = useMemo(() => highlight(FOOTER.join('\n')), []);
+  const head = useMemo(() => (HEADER.length ? highlight(HEADER.join('\n')) : []), [HEADER]);
+  const foot = useMemo(() => (FOOTER.length ? highlight(FOOTER.join('\n')) : []), [FOOTER]);
   const longest = Math.max(...userLines.map((l) => l.length), 36);
   const lastLine = FIRST_LINE + userLines.length - 1;
 
@@ -72,17 +76,17 @@ export default function CodeEditor({ value, onChange, activeLine, errorLine }) {
   return (
     <div className="editor" onClick={() => ta.current?.focus()}>
       <div className="editor-gutter" aria-hidden="true">
-        {HEADER.map((_, i) => <div key={`h${i}`} className="gl muted">{i + 1}</div>)}
+        {HEADER.map((_, i) => <div key={`h${i}`} className={`gl muted ${lineClass(i + 1)}`}>{i + 1}</div>)}
         {userLines.map((_, i) => {
           const n = FIRST_LINE + i;
           return <div key={n} className={`gl ${lineClass(n)}`}>{n}</div>;
         })}
-        {FOOTER.map((_, i) => <div key={`f${i}`} className="gl muted">{lastLine + 1 + i}</div>)}
+        {FOOTER.map((_, i) => <div key={`f${i}`} className={`gl muted ${lineClass(lastLine + 1 + i)}`}>{lastLine + 1 + i}</div>)}
       </div>
       <div className="editor-scroll">
-        <div className="editor-inner" style={{ minWidth: `${longest + 12}ch` }}>
+        <div className="editor-inner" style={{ minWidth: `${Math.max(longest + 12, ...[...HEADER, ...FOOTER].map((l) => l.length + 2))}ch`, '--indent': `${frame.indent ?? 8}ch` }}>
           <div className="editor-fixed">
-            {head.map((l, i) => <div key={i} className="cl"><Line segs={l} /></div>)}
+            {head.map((l, i) => <div key={i} className={lineClass(i + 1)}><Line segs={l} /></div>)}
           </div>
           <div className="editor-edit">
             <pre className="editor-hl" aria-hidden="true">
@@ -104,7 +108,7 @@ export default function CodeEditor({ value, onChange, activeLine, errorLine }) {
             />
           </div>
           <div className="editor-fixed">
-            {foot.map((l, i) => <div key={i} className="cl"><Line segs={l} /></div>)}
+            {foot.map((l, i) => <div key={i} className={lineClass(lastLine + 1 + i)}><Line segs={l} /></div>)}
           </div>
         </div>
       </div>

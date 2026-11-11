@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { LEVELS } from './content/index.js';
-import { createWorld } from './engine/index.js';
+import { createWorld, MAIN_FRAME } from './engine/index.js';
 import { useProgress } from './state/useProgress.js';
 import { useAutoRun } from './state/useAutoRun.js';
 import { usePlayback, SPEEDS } from './state/usePlayback.js';
@@ -126,7 +126,7 @@ export default function App() {
               <span className="file-tab">Main.java</span>
               <span className={`run-status ${status.cls}`}>{status.text}</span>
             </div>
-            <CodeEditor value={code} onChange={progress.setCode} activeLine={activeLine} errorLine={errorLine} />
+            <CodeEditor value={code} onChange={progress.setCode} activeLine={activeLine} errorLine={errorLine} frame={level.frame ?? MAIN_FRAME} />
             <div className="code-foot">
               <button className="btn btn-ghost" onClick={pb.restart} disabled={!pb.run} type="button">
                 <Icon name="replay" /> Rejouer
@@ -170,7 +170,7 @@ export default function App() {
             <>
               <StepBar pb={pb} />
               <div className="duo">
-                <Memory vars={current?.vars ?? []} />
+                <Memory vars={current?.vars ?? []} frames={current?.frames ?? []} />
                 <ConsoleView out={current?.out ?? ''} error={runtimeError} />
               </div>
             </>

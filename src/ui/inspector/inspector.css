@@ -101,3 +101,48 @@
   .transport .segmented { width: 100%; }
   .transport .seg { flex: 1; }
 }
+
+/* ---------- Pile d'appels, tableaux et objets ---------- */
+.frames { display: flex; flex-direction: column; gap: 8px; padding: 6px 10px 12px; }
+.frame { border-radius: 14px; border: 2px dashed var(--line); padding: 4px 4px 0; }
+.frame-solo { border: 0; padding: 0; }
+.frame-current { border-style: solid; border-color: #b9cff8; background: #f7faff; }
+.frame-solo.frame-current { background: none; }
+.frame-title { display: inline-block; margin: 4px 0 0 10px; font: 700 13px var(--mono); color: var(--ink-3); }
+.frame-current .frame-title { color: var(--blue-ink); }
+.frame .boxes { padding-top: 16px; }
+.frame .panel-empty { padding: 6px 12px 10px; }
+
+.box-wide { align-items: flex-start; }
+.box.t-array { background: #f0fbff; border-color: #95d5ee; box-shadow: 0 4px 0 #95d5ee; }
+.box.t-array .box-type { background: #95d5ee; color: #0f5873; }
+.box.t-object { background: #fff4fb; border-color: #f2b3d8; box-shadow: 0 4px 0 #f2b3d8; }
+.box.t-object .box-type { background: #f2b3d8; color: #7a1f55; }
+.box-wide .box-name { align-self: center; }
+
+.cells { display: flex; flex-wrap: wrap; gap: 4px; }
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 40px;
+  padding: 4px 6px 2px;
+  border-radius: 8px;
+  background: #fff;
+  border: 2px solid #c6e8f5;
+}
+.cell-value { font: 800 16px var(--mono); white-space: nowrap; }
+.cell-index { font: 700 10px var(--mono); color: var(--ink-4); }
+.cell-changed { border-color: var(--blue); background: var(--blue-soft); }
+.cell-changed .cell-value { animation: pop 420ms var(--ease-out); color: var(--blue-ink); }
+.cell-empty { font: 600 13px var(--font); color: var(--ink-4); }
+
+.obj { display: flex; flex-direction: column; gap: 3px; min-width: 150px; }
+.obj-head { font: 700 14px var(--font-display); color: #7a1f55; }
+.obj-head small { font-weight: 600; opacity: 0.7; }
+.obj-field { display: flex; justify-content: space-between; gap: 10px; padding: 3px 8px; border-radius: 8px; background: #fff; }
+.obj-name { font: 600 13px var(--mono); color: var(--ink-2); }
+.obj-value { font: 800 14px var(--mono); white-space: nowrap; }
+.obj-changed { background: var(--blue-soft); }
+.obj-changed .obj-value { animation: pop 420ms var(--ease-out); color: var(--blue-ink); }
+.obj-none { color: var(--ink-4); font-size: 13px; }

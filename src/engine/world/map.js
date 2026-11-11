@@ -18,6 +18,7 @@ export function createWorld(def) {
   const w = {
     cols, rows, walls: [], robot: null, goal: null, chest: null, door: null, terminal: null, sensor: null, lever: null,
     badge: def.badge ?? false, energy: def.energy ?? 100, bumped: null, alarm: false, visited: [],
+    notes: def.notes ?? [], prix: def.prix ?? [],
   };
   def.map.forEach((row, y) => {
     [...row].forEach((ch, x) => {

@@ -37,6 +37,18 @@ export const OBJECT_TYPES = {
       temperature: { params: [], ret: 'int', doc: 'température de la pièce en °C' },
     },
   },
+  ecole: {
+    type: 'Ecole',
+    methods: {
+      notes: { params: [], ret: 'int[]', doc: 'renvoie le tableau des notes de la classe' },
+    },
+  },
+  caisse: {
+    type: 'Caisse',
+    methods: {
+      prix: { params: [], ret: 'double[]', doc: 'renvoie le tableau des prix des articles scannés' },
+    },
+  },
   leviers: {
     type: 'Leviers',
     methods: {
@@ -112,6 +124,12 @@ export const API = {
   },
   thermostat: {
     temperature(w) { return { value: w.sensor.temp }; },
+  },
+  ecole: {
+    notes(w) { return { value: [...w.notes], desc: `L'école transmet ${w.notes.length} notes.` }; },
+  },
+  caisse: {
+    prix(w) { return { value: [...w.prix], desc: `La caisse transmet ${w.prix.length} prix.` }; },
   },
   leviers: {
     activer(w, [n]) {

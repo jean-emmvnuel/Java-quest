@@ -21,7 +21,8 @@
 
 .editor-scroll { flex: 1; min-width: 0; overflow-x: auto; }
 .editor-inner { position: relative; padding-right: 16px; }
-.editor-fixed { color: var(--ink-4); }
+.editor-fixed { color: var(--ink-3); }
+.editor-fixed .cl-active { color: var(--ink); }
 .editor-fixed .tk-kw, .editor-fixed .tk-type, .editor-fixed .tk-fn, .editor-fixed .tk-id { color: inherit; font-weight: 500; }
 
 .cl { height: 24px; white-space: pre; border-radius: 0 8px 8px 0; transition: background-color 160ms ease; }
@@ -32,12 +33,12 @@
 .editor-edit {
   position: relative;
   margin: 4px 0;
-  padding-left: 8ch;
+  padding-left: var(--indent, 8ch);
 }
 .editor-edit::before {
   content: "";
   position: absolute;
-  inset: -4px 0 -4px calc(8ch - 10px);
+  inset: -4px 0 -4px calc(var(--indent, 8ch) - 10px);
   border-radius: 10px;
   background: var(--yellow-soft);
   border: 2px dashed var(--yellow);
@@ -45,11 +46,11 @@
 }
 .editor-edit:focus-within::before { border-style: solid; background: #fffbea; }
 .editor-hl { position: relative; margin: 0; font: inherit; pointer-events: none; }
-.editor-edit .cl { margin-left: -8ch; padding-left: 8ch; }
+.editor-edit .cl { margin-left: calc(-1 * var(--indent, 8ch)); padding-left: var(--indent, 8ch); }
 .editor-input {
   position: absolute;
-  inset: 0 0 0 8ch;
-  width: calc(100% - 8ch);
+  inset: 0 0 0 var(--indent, 8ch);
+  width: calc(100% - var(--indent, 8ch));
   height: 100%;
   margin: 0;
   padding: 0;
