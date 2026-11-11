@@ -1,0 +1,74 @@
+.editor {
+  display: flex;
+  padding: 12px 0;
+  background: var(--code-bg);
+  font: 15px/24px var(--mono);
+  cursor: text;
+}
+.editor-gutter {
+  flex: none;
+  min-width: 46px;
+  padding: 0 10px 0 12px;
+  text-align: right;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+.gl { height: 24px; border-radius: 8px 0 0 8px; padding-right: 4px; }
+.gl.muted { opacity: 0.7; }
+.gl.cl-active { color: var(--blue-ink); font-weight: 700; }
+.gl.cl-error { color: var(--coral-ink); font-weight: 700; }
+
+.editor-scroll { flex: 1; min-width: 0; overflow-x: auto; }
+.editor-inner { position: relative; padding-right: 16px; }
+.editor-fixed { color: var(--ink-4); }
+.editor-fixed .tk-kw, .editor-fixed .tk-type, .editor-fixed .tk-fn, .editor-fixed .tk-id { color: inherit; font-weight: 500; }
+
+.cl { height: 24px; white-space: pre; border-radius: 0 8px 8px 0; transition: background-color 160ms ease; }
+.cl-active { background: var(--blue-soft); box-shadow: inset 4px 0 0 var(--blue); }
+.cl-error { background: var(--coral-soft); box-shadow: inset 4px 0 0 var(--coral); }
+
+/* Zone modifiable : surlignée comme un « champ » où l'on peut écrire */
+.editor-edit {
+  position: relative;
+  margin: 4px 0;
+  padding-left: 8ch;
+}
+.editor-edit::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0 -4px calc(8ch - 10px);
+  border-radius: 10px;
+  background: var(--yellow-soft);
+  border: 2px dashed var(--yellow);
+  pointer-events: none;
+}
+.editor-edit:focus-within::before { border-style: solid; background: #fffbea; }
+.editor-hl { position: relative; margin: 0; font: inherit; pointer-events: none; }
+.editor-edit .cl { margin-left: -8ch; padding-left: 8ch; }
+.editor-input {
+  position: absolute;
+  inset: 0 0 0 8ch;
+  width: calc(100% - 8ch);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--ink);
+  font: inherit;
+  white-space: pre;
+  tab-size: 4;
+}
+.editor-input::selection { background: rgba(79, 140, 255, 0.25); color: transparent; }
+
+.tk-kw { color: #c2297a; font-weight: 700; }
+.tk-type { color: #7a3fd1; font-weight: 600; }
+.tk-str { color: #d14a1f; }
+.tk-num { color: #2f55d4; font-weight: 600; }
+.tk-com { color: #8a94a6; font-style: italic; }
+.tk-fn { color: #0f8a7a; font-weight: 600; }

@@ -1,0 +1,95 @@
+import { expectOutput, goalCheck } from '../validators.js';
+
+export default {
+  id: 'decouverte',
+  num: 1,
+  title: 'Découverte',
+  place: 'L\'entrepôt',
+  summary: 'Ton premier jour à l\'entrepôt : afficher des messages et piloter le robot de livraison.',
+  levels: [
+    {
+      id: '1-1',
+      title: 'Allumer le terminal',
+      story: 'Le terminal de l\'entrepôt attend son premier message pour démarrer la journée.',
+      goal: [
+        'Affiche exactement le texte `Bonjour le monde` dans la console.',
+        'En Java, on affiche avec `System.out.println(…)`. Le texte se place entre guillemets.',
+      ],
+      notion: {
+        title: 'Afficher un message',
+        text: 'System.out.println écrit une ligne dans la console puis passe à la ligne suivante. Chaque instruction se termine par un point-virgule.',
+        code: 'System.out.println("Salut !");',
+      },
+      objects: [],
+      starter: '// Écris ton instruction ici\n',
+      solution: 'System.out.println("Bonjour le monde");\n',
+      hints: [
+        'Recopie la forme de l\'exemple : System.out.println("…");',
+        'Attention aux majuscules : System prend un S majuscule. Et n\'oublie pas le ; à la fin.',
+      ],
+      tests: [{ world: { map: ['.....', '.R.T.', '.....'] } }],
+      check: (run) => expectOutput(run, ['Bonjour le monde']),
+    },
+    {
+      id: '1-2',
+      title: 'La check-list du matin',
+      story: 'Chaque matin, le terminal vérifie les équipements dans un ordre précis.',
+      goal: [
+        'Affiche ces trois lignes, dans cet ordre :',
+        '`Lumières : OK` puis `Portes : OK` puis `Robot : OK`.',
+        'Le code s\'exécute de haut en bas, une instruction après l\'autre : l\'ordre des lignes compte.',
+      ],
+      notion: {
+        title: 'L\'ordre d\'exécution',
+        text: 'Java exécute les instructions du main dans l\'ordre où elles sont écrites. Utilise le mode Pas à pas pour le voir.',
+        code: 'System.out.println("1");\nSystem.out.println("2");',
+      },
+      objects: [],
+      starter: 'System.out.println("Portes : OK");\nSystem.out.println("Lumières : OK");\n',
+      solution: 'System.out.println("Lumières : OK");\nSystem.out.println("Portes : OK");\nSystem.out.println("Robot : OK");\n',
+      hints: ['Les deux premières lignes sont dans le mauvais ordre.', 'Ajoute une troisième ligne pour le robot.'],
+      tests: [{ world: { map: ['.....', '.R.T.', '.....'] } }],
+      check: (run) => expectOutput(run, ['Lumières : OK', 'Portes : OK', 'Robot : OK']),
+    },
+    {
+      id: '1-3',
+      title: 'Premiers pas',
+      story: 'Un colis attend sur la zone de livraison. Le robot doit s\'y rendre.',
+      goal: [
+        'Fais avancer le robot jusqu\'à la zone d\'arrivée (le carré vert).',
+        '`robot.avancer()` le fait avancer d\'une case dans la direction où il regarde.',
+      ],
+      notion: {
+        title: 'Appeler une méthode',
+        text: 'Un objet (ici robot) sait faire des actions : ses méthodes. On les appelle avec un point, le nom de la méthode et des parenthèses.',
+        code: 'robot.avancer();',
+      },
+      objects: ['robot'],
+      starter: 'robot.avancer();\n',
+      solution: 'robot.avancer();\nrobot.avancer();\nrobot.avancer();\nrobot.avancer();\n',
+      hints: ['Compte les cases entre le robot et la zone verte.', 'Il faut 4 appels à robot.avancer();'],
+      tests: [{ world: { map: ['......', 'R...G.', '......'] } }],
+      check: goalCheck,
+    },
+    {
+      id: '1-4',
+      title: 'Le virage',
+      story: 'L\'allée de l\'entrepôt fait un coude. Le robot doit tourner pour atteindre le quai.',
+      goal: [
+        'Amène le robot sur la zone d\'arrivée.',
+        'Utilise `robot.tournerDroite()` ou `robot.tournerGauche()` pour pivoter d\'un quart de tour.',
+      ],
+      notion: {
+        title: 'Une suite d\'actions',
+        text: 'Un programme est une suite d\'instructions. Pour réussir, découpe le trajet : avancer, tourner, avancer.',
+        code: 'robot.avancer();\nrobot.tournerDroite();',
+      },
+      objects: ['robot'],
+      starter: 'robot.avancer();\n',
+      solution: 'robot.avancer();\nrobot.avancer();\nrobot.tournerDroite();\nrobot.avancer();\nrobot.avancer();\nrobot.avancer();\n',
+      hints: ['Le robot regarde vers la droite (l\'est) au départ.', 'Avance 2 fois, tourne à droite, puis avance 3 fois.'],
+      tests: [{ world: { map: ['R..#', '##.#', '##.#', '##G#'] } }],
+      check: goalCheck,
+    },
+  ],
+};

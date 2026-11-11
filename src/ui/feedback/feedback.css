@@ -1,0 +1,60 @@
+.feedback {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: var(--r-lg);
+  border: 3px solid;
+  animation: rise 320ms var(--ease) both;
+}
+.feedback .mascot { flex: none; }
+.feedback h3 { margin: 2px 0 2px; font: 700 17px var(--font-display); }
+.feedback p { margin: 0; font-size: 15px; }
+.feedback-hint { margin-top: 6px !important; color: var(--ink-2); }
+.feedback-typing { background: #f6f8fc; border-color: var(--line); }
+.feedback-typing h3 { color: var(--ink-3); }
+.feedback-error { background: var(--coral-soft); border-color: #ffc2bd; }
+.feedback-error h3 { color: var(--coral-ink); }
+.feedback-warn { background: var(--yellow-soft); border-color: #ffe08a; }
+.feedback-warn h3 { color: #9a6700; }
+
+.win-root { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; }
+.win-root .win-scrim { opacity: 1; position: absolute; inset: 0; background: rgba(31, 42, 68, 0.3); animation: fade 250ms ease both; }
+.win-card {
+  position: relative;
+  width: min(440px, 100%);
+  padding: 28px 24px 22px;
+  border-radius: 28px;
+  background: #fff;
+  border: 3px solid var(--line);
+  box-shadow: 0 8px 0 var(--line), 0 30px 80px rgba(31, 42, 68, 0.25);
+  text-align: center;
+  animation: win-in 520ms var(--ease) both;
+  overflow: hidden;
+}
+.win-card .mascot { margin: 0 auto 6px; }
+.win-card h2 { margin: 0 0 10px; font: 800 26px var(--font-display); }
+.win-card p { margin: 12px 0 18px; color: var(--ink-2); }
+.win-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+.confetti { position: absolute; inset: 0; pointer-events: none; }
+.confetti span {
+  position: absolute;
+  top: -12px;
+  left: calc(var(--i) * 5.6% + 2%);
+  width: 9px;
+  height: 14px;
+  border-radius: 3px;
+  background: hsl(calc(var(--i) * 53) 85% 60%);
+  animation: fall 1.5s calc(var(--i) * 45ms) var(--ease-out) both;
+}
+
+.stars { display: inline-flex; gap: 4px; }
+.star { color: #dfe5f0; display: inline-flex; }
+.star.on { color: var(--yellow); }
+.stars-animate .star.on { animation: star-in 520ms calc(250ms + var(--i) * 160ms) var(--ease-out) both; }
+
+@keyframes win-in { from { opacity: 0; transform: scale(0.9) translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes star-in { 0% { transform: scale(0) rotate(-40deg); } 70% { transform: scale(1.25) rotate(8deg); } 100% { transform: scale(1); } }
+@keyframes fall { from { transform: translateY(0) rotate(0); opacity: 1; } to { transform: translateY(380px) rotate(540deg); opacity: 0; } }
+@keyframes fade { from { opacity: 0; } }

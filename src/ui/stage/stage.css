@@ -1,0 +1,107 @@
+.stage {
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  border: 3px solid var(--line);
+  box-shadow: 0 6px 0 var(--line), var(--shadow);
+  overflow: hidden;
+}
+.stage-tabs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--line);
+  overflow-x: auto;
+}
+.stage-tabs-label { font: 700 13px var(--font-display); color: var(--ink-3); white-space: nowrap; }
+.stage-view {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  padding: 26px;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.9) 0 40px, transparent 41px),
+    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.7) 0 60px, transparent 61px),
+    linear-gradient(180deg, #dff1ff 0%, #e9fbef 100%);
+}
+.scene { width: 100%; max-width: 560px; max-height: 340px; height: auto; overflow: visible; }
+
+.tile { fill: #fffdf6; stroke: #efe6d2; stroke-width: 2; }
+.tile-b { fill: #fbf6ea; }
+.trail { fill: var(--blue); opacity: 0.35; }
+
+.crate-side { fill: #b9814f; }
+.crate-top { fill: #e0a96d; stroke: #c98d55; stroke-width: 2; }
+.crate-plank { stroke: #c98d55; stroke-width: 3; stroke-linecap: round; }
+
+.goal-pad { fill: #c9f5dc; stroke: var(--green); stroke-width: 3; stroke-dasharray: 6 6; animation: pad-pulse 1.6s ease-in-out infinite; }
+.goal-pole { stroke: #3b4a6b; stroke-width: 3; stroke-linecap: round; }
+.goal-flag { fill: var(--coral); }
+.goal.reached .goal-pad { stroke-dasharray: none; fill: #8fe3b4; animation: none; }
+
+.robot-pos { transition: transform var(--move, 380ms) var(--ease-out); }
+.robot-rot { transition: transform var(--move, 340ms) var(--ease-out); }
+.robot-shadow { fill: rgba(31, 42, 68, 0.14); }
+.robot-body { fill: var(--blue); }
+.robot-shine { fill: #fff; opacity: 0.18; }
+.robot-face { fill: #fff; }
+.robot-eye { fill: var(--ink); }
+.robot-nose { fill: var(--yellow); }
+.robot-bump { animation: bump 420ms var(--ease-out); }
+.robot-bump .robot-body { fill: var(--coral); }
+.battery-bg { fill: #dfe5f0; }
+.battery { fill: var(--green); }
+.battery-low { fill: var(--coral); }
+
+.chest-body { fill: #6b7a99; }
+.chest-front { fill: #93a1bd; }
+.chest-dial { fill: #e8edf6; stroke: #4a5878; stroke-width: 2.5; }
+.chest-needle { stroke: #2b3550; stroke-width: 2.5; stroke-linecap: round; }
+.chest-led { fill: var(--coral); }
+.chest-door { transform-box: fill-box; transform-origin: left center; transition: transform 520ms var(--ease); }
+.chest.is-open .chest-door { transform: translateX(-3px) scaleX(0.25); }
+.chest.is-open .chest-body { fill: var(--yellow); }
+.chest.is-open .chest-led { fill: var(--green); }
+.chest-coins { font: 800 22px var(--font-display); fill: #a86b00; text-anchor: middle; animation: pop 400ms var(--ease-out); }
+.chest.is-wrong:not(.is-open) .chest-door { animation: shake 360ms var(--ease-out); }
+
+.door-frame { fill: #fff; stroke: #8e9ab3; stroke-width: 3; }
+.door-panel { transform-box: fill-box; transform-origin: top center; transition: transform 450ms var(--ease), opacity 450ms ease; }
+.door-fill { fill: #ffe1b3; stroke: var(--orange); stroke-width: 2.5; }
+.door-bar { stroke: var(--orange); stroke-width: 3; stroke-linecap: round; }
+.door.is-open .door-panel { transform: scaleY(0.1); opacity: 0.5; }
+.door.is-open .door-frame { stroke: var(--green); }
+
+.terminal-body { fill: #5b6b8c; }
+.terminal-screen { fill: #dfe7f5; transition: fill 300ms ease; }
+.terminal-foot { fill: #8e9ab3; }
+.terminal-text { font: 700 9px var(--mono); fill: #8e9ab3; text-anchor: middle; }
+.terminal.is-on .terminal-screen { fill: #d6fbe5; }
+.terminal.is-on .terminal-text { fill: #1a8a4e; }
+
+.sensor-ring { fill: #fff; stroke: #c6d0e2; stroke-width: 4; }
+.sensor-face.cold { fill: #cfe6ff; }
+.sensor-face.mild { fill: #c9f5dc; }
+.sensor-face.hot { fill: #ffd2cc; }
+.sensor-text { font: 800 15px var(--font-display); fill: var(--ink); text-anchor: middle; }
+
+.levers-panel { fill: #fff; stroke: #c6d0e2; stroke-width: 3; }
+.lever { fill: #e3e8f2; transition: fill 250ms ease; }
+.lever.on-1 { fill: var(--orange); }
+.lever.on-2 { fill: var(--green); }
+.lever.on-3 { fill: var(--blue); }
+.lever-knob { fill: #fff; stroke: rgba(31, 42, 68, 0.2); stroke-width: 1.5; transition: cy 300ms var(--ease-out); }
+.lever-label { font: 800 9px var(--font-display); fill: var(--ink-3); text-anchor: middle; }
+
+@keyframes pad-pulse { 50% { stroke-dashoffset: 6; opacity: 0.75; } }
+@keyframes bump {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(6px, 0); }
+  50% { transform: translate(-5px, 0); }
+  75% { transform: translate(2px, 0); }
+}
+@keyframes shake { 30% { transform: translateX(-3px); } 60% { transform: translateX(3px); } }
+
+@media (max-width: 640px) {
+  .stage-view { padding: 14px; min-height: 200px; }
+}

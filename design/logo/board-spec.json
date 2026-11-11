@@ -1,0 +1,30 @@
+{
+  "brand": "Java Quest",
+  "tagline": "Apprendre Java en voyant ce que fait le code",
+  "brief": "Un jeu dans le navigateur pour apprendre Java, pensé pour les plus jeunes : clair, ludique, bienveillant, sans jamais faire peur.",
+  "adjectives": ["ludique", "bienveillant", "clair", "curieux"],
+  "criteria": "Reconnaissable à 16 px, propre à Java, parle aux enfants, fonctionne en une couleur.",
+  "industry": "education",
+  "mockups": ["app-icon", "website", "favicon-tab", "sticker", "tshirt", "badge"],
+  "nav": ["Missions", "Progression", "Projets"],
+  "brand_color": "#4F8CFF",
+  "greyscale": false,
+  "final": true,
+  "designer": "Java Quest",
+  "round": 2,
+  "concepts": [
+    {
+      "name": "Point-virgule",
+      "symbol": "final/javaquest-symbol.svg",
+      "lockup": "final/javaquest-horizontal.svg",
+      "idea": "Le ; qui termine chaque instruction Java devient un petit personnage curieux qui regarde vers l'avant.",
+      "rationale": [
+        "Propre à Java : c'est le premier signe que l'on apprend à écrire",
+        "Un personnage, pas un pictogramme : il parle aux enfants",
+        "Silhouette simple, lisible à 16 px grâce à une version simplifiée"
+      ]
+    }
+  ],
+  "recommendation": "Point-virgule : un signe que l'élève écrira des centaines de fois, devenu le compagnon de sa quête.",
+  "next_steps": ["Intégrer le logo dans le jeu", "Décliner le personnage en expressions (réussite, réflexion)", "Vérification des marques avant usage public"]
+}

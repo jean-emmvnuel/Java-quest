@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Le point-virgule héros : la tête (point) et le corps (virgule), deux yeux en creux -->
+  <path fill-rule="evenodd" d="M128 30a46 46 0 1 1 0 92a46 46 0 1 1 0-92zM111 80a10 10 0 1 0 0-.1zM145 80a10 10 0 1 0 0-.1z"/>
+  <circle cx="128" cy="176" r="40"/>
+  <path d="M168 176c0 40-26 64-66 74l-8-19c26-9 40-25 42-49z"/>
+</svg>

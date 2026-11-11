@@ -1,0 +1,41 @@
+/* Design tokens — thème clair unique, pensé pour les plus jeunes :
+   couleurs franches, grandes zones de clic, coins très arrondis. */
+:root {
+  color-scheme: light;
+
+  --bg: #f3f8ff;
+  --surface: #ffffff;
+  --line: #dde5f2;
+  --ink: #1f2a44;
+  --ink-2: #44506b;
+  --ink-3: #6b7790;
+  --ink-4: #9aa5bb;
+
+  --blue: #4f8cff;
+  --blue-dark: #2f6be0;
+  --blue-ink: #1f56c4;
+  --blue-soft: #e5efff;
+  --green: #2fbf71;
+  --green-dark: #1f9a58;
+  --green-ink: #17804a;
+  --green-soft: #e3f8ec;
+  --yellow: #ffc233;
+  --yellow-soft: #fff6dc;
+  --coral: #ff6b5e;
+  --coral-ink: #c9372b;
+  --coral-soft: #fff0ee;
+  --orange: #ff9f2e;
+  --purple-soft: #f3eeff;
+
+  --code-bg: #ffffff;
+
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --shadow: 0 10px 30px rgba(31, 42, 68, 0.06);
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --font: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}

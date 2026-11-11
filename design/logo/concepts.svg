@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="984" viewBox="0 0 1600 984"><defs><filter id="grey"><feColorMatrix type="saturate" values="0"/></filter></defs><rect width="1600" height="984" fill="#f7f7f4"/><text x="60" y="78" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="40" font-weight="700" fill="#161616">Logo concepts</text><text x="60" y="116" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="20" fill="#6b6b6b">Concepts for review — pick a direction (or tell me what you like in each).</text><rect x="60" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#161616" stroke-width="2"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="90" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <!-- Le point-virgule héros : la tête (point) et le corps (virgule), deux yeux en creux -->
+  <path fill-rule="evenodd" d="M128 30a46 46 0 1 1 0 92a46 46 0 1 1 0-92zM111 80a10 10 0 1 0 0-.1zM145 80a10 10 0 1 0 0-.1z"/>
+  <circle cx="128" cy="176" r="40"/>
+  <path d="M168 176c0 40-26 64-66 74l-8-19c26-9 40-25 42-49z"/>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 256" x="90" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <g transform="translate(0 0)"><path fill-rule="evenodd" d="M128 30a46 46 0 1 1 0 92a46 46 0 1 1 0-92zM111 80a10 10 0 1 0 0-.1zM145 80a10 10 0 1 0 0-.1z"/><circle cx="128" cy="176" r="40"/><path d="M168 176c0 40-26 64-66 74l-8-19c26-9 40-25 42-49z"/></g>
+  <text x="230" y="160" font-family="Fredoka, Nunito, sans-serif" font-weight="700" font-size="92">Java Quest</text>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="90" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <!-- Le point-virgule héros : la tête (point) et le corps (virgule), deux yeux en creux -->
+  <path fill-rule="evenodd" d="M128 30a46 46 0 1 1 0 92a46 46 0 1 1 0-92zM111 80a10 10 0 1 0 0-.1zM145 80a10 10 0 1 0 0-.1z"/>
+  <circle cx="128" cy="176" r="40"/>
+  <path d="M168 176c0 40-26 64-66 74l-8-19c26-9 40-25 42-49z"/>
+</svg>
+</g><text x="122" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="180" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <!-- Le point-virgule héros : la tête (point) et le corps (virgule), deux yeux en creux -->
+  <path fill-rule="evenodd" d="M128 30a46 46 0 1 1 0 92a46 46 0 1 1 0-92zM111 80a10 10 0 1 0 0-.1zM145 80a10 10 0 1 0 0-.1z"/>
+  <circle cx="128" cy="176" r="40"/>
+  <path d="M168 176c0 40-26 64-66 74l-8-19c26-9 40-25 42-49z"/>
+</svg>
+</g><text x="196" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="238" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <!-- Le point-virgule héros : la tête (point) et le corps (virgule), deux yeux en creux -->
+  <path fill-rule="evenodd" d="M128 30a46 46 0 1 1 0 92a46 46 0 1 1 0-92zM111 80a10 10 0 1 0 0-.1zM145 80a10 10 0 1 0 0-.1z"/>
+  <circle cx="128" cy="176" r="40"/>
+  <path d="M168 176c0 40-26 64-66 74l-8-19c26-9 40-25 42-49z"/>
+</svg>
+</g><text x="246" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="90.0" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">A · Point-virgule</text><text x="90.0" y="808" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#161616" letter-spacing="1.5">RECOMMENDED</text><text x="90.0" y="842" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">Le ; de Java devient Bit, un petit héros :</text><text x="90.0" y="868" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">chaque instruction se termine par lui.</text><rect x="562.667" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="592.667" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <!-- L'accolade-chemin : une { qui serpente comme une route vers une étoile -->
+  <path d="M150 220c-44 0-40-34-40-56c0-20-10-36-36-36c26 0 36-16 36-36c0-22-4-56 40-56" fill="none" stroke="#000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M196 30l9 19 21 3-15 14 4 21-19-10-19 10 4-21-15-14 21-3z"/>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 256" x="592.667" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <g><path d="M150 220c-44 0-40-34-40-56c0-20-10-36-36-36c26 0 36-16 36-36c0-22-4-56 40-56" fill="none" stroke="#000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/><path d="M196 30l9 19 21 3-15 14 4 21-19-10-19 10 4-21-15-14 21-3z"/></g>
+  <text x="230" y="160" font-family="Fredoka, Nunito, sans-serif" font-weight="700" font-size="92">Java Quest</text>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="592.667" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <!-- L'accolade-chemin : une { qui serpente comme une route vers une étoile -->
+  <path d="M150 220c-44 0-40-34-40-56c0-20-10-36-36-36c26 0 36-16 36-36c0-22-4-56 40-56" fill="none" stroke="#000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M196 30l9 19 21 3-15 14 4 21-19-10-19 10 4-21-15-14 21-3z"/>
+</svg>
+</g><text x="624.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="682.667" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <!-- L'accolade-chemin : une { qui serpente comme une route vers une étoile -->
+  <path d="M150 220c-44 0-40-34-40-56c0-20-10-36-36-36c26 0 36-16 36-36c0-22-4-56 40-56" fill="none" stroke="#000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M196 30l9 19 21 3-15 14 4 21-19-10-19 10 4-21-15-14 21-3z"/>
+</svg>
+</g><text x="698.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="740.667" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <!-- L'accolade-chemin : une { qui serpente comme une route vers une étoile -->
+  <path d="M150 220c-44 0-40-34-40-56c0-20-10-36-36-36c26 0 36-16 36-36c0-22-4-56 40-56" fill="none" stroke="#000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M196 30l9 19 21 3-15 14 4 21-19-10-19 10 4-21-15-14 21-3z"/>
+</svg>
+</g><text x="748.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="592.6666666666667" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">B · Accolade-chemin</text><text x="592.6666666666667" y="814" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">Une { qui serpente comme une route de quête</text><text x="592.6666666666667" y="840" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">vers une étoile.</text><rect x="1065.33" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="1095.33" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <!-- Monogramme JQ : la queue du Q est un J qui traverse l'anneau et se recourbe -->
+  <circle cx="128" cy="108" r="74" fill="none" stroke="#000" stroke-width="32"/>
+  <path d="M128 136v76c0 30-40 34-52 12" fill="none" stroke="#000" stroke-width="32" stroke-linecap="round"/>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 256" x="1095.33" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <g><circle cx="128" cy="108" r="74" fill="none" stroke="#000" stroke-width="32"/><path d="M128 136v76c0 30-40 34-52 12" fill="none" stroke="#000" stroke-width="32" stroke-linecap="round"/></g>
+  <text x="230" y="160" font-family="Fredoka, Nunito, sans-serif" font-weight="700" font-size="92">Java Quest</text>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="1095.33" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <!-- Monogramme JQ : la queue du Q est un J qui traverse l'anneau et se recourbe -->
+  <circle cx="128" cy="108" r="74" fill="none" stroke="#000" stroke-width="32"/>
+  <path d="M128 136v76c0 30-40 34-52 12" fill="none" stroke="#000" stroke-width="32" stroke-linecap="round"/>
+</svg>
+</g><text x="1127.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="1185.33" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <!-- Monogramme JQ : la queue du Q est un J qui traverse l'anneau et se recourbe -->
+  <circle cx="128" cy="108" r="74" fill="none" stroke="#000" stroke-width="32"/>
+  <path d="M128 136v76c0 30-40 34-52 12" fill="none" stroke="#000" stroke-width="32" stroke-linecap="round"/>
+</svg>
+</g><text x="1201.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="1243.33" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <!-- Monogramme JQ : la queue du Q est un J qui traverse l'anneau et se recourbe -->
+  <circle cx="128" cy="108" r="74" fill="none" stroke="#000" stroke-width="32"/>
+  <path d="M128 136v76c0 30-40 34-52 12" fill="none" stroke="#000" stroke-width="32" stroke-linecap="round"/>
+</svg>
+</g><text x="1251.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="1095.3333333333335" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">C · Monogramme JQ</text><text x="1095.3333333333335" y="814" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">La queue du Q est un J : Java et Quête en</text><text x="1095.3333333333335" y="840" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">un seul signe.</text></svg>
