@@ -3,9 +3,9 @@
 Apprendre Java en voyant ce que le code fait réellement. Tout tourne dans le navigateur, sans backend.
 L'application est installable (PWA) et fonctionne **hors connexion**.
 
-Missions jouables : 1 Découverte · 2 Variables · 3 Conditions · 4 Boucles · 5 Tableaux · 6 Fonctions et procédures · 7 Classes et objets · 8 Héritage · 9 POO approfondie · 10 Mission combinée (44 niveaux).
+Missions jouables : 1 Découverte · 2 Variables · 3 Conditions · 4 Boucles · 5 Tableaux · 6 Fonctions et procédures · 7 Classes et objets · 8 Héritage · 9 POO approfondie · 10 Mission combinée (44 niveaux), puis 4 projets de la vie réelle (22 étapes) : 66 niveaux au total.
 
-Projets de la vie réelle : **Application bancaire** (6 étapes : compte, opérations sécurisées, historique avec `ArrayList`, virements, banque, compte épargne). **Suivi des dépenses** (5 étapes : opération, carnet de comptes, totaux par catégorie, budget, sauvegarde dans un fichier). **Pendu et Morpion** (6 étapes : mot caché, proposer une lettre, gagné ou perdu, grille 2D, jouer un coup, trouver le gagnant). Chaque étape reprend le code écrit à l'étape précédente, comme dans un vrai projet. Le projet « Gestion des employés » arrive ensuite.
+Projets de la vie réelle : **Application bancaire** (6 étapes : compte, opérations sécurisées, historique avec `ArrayList`, virements, banque, compte épargne). **Suivi des dépenses** (5 étapes : opération, carnet de comptes, totaux par catégorie, budget, sauvegarde dans un fichier). **Pendu et Morpion** (6 étapes : mot caché, proposer une lettre, gagné ou perdu, grille 2D, jouer un coup, trouver le gagnant). **Gestion des employés** (5 étapes : employé, département et moyennes, recherche et licenciement, stagiaires et coût total, rapport d'entreprise). Chaque étape reprend le code écrit à l'étape précédente, comme dans un vrai projet.
 
 Java pris en charge : types de base, `String`, conditions, boucles (dont for-each), tableaux (y compris à deux dimensions), `ArrayList<T>`, `split`, `Integer.parseInt` / `Double.parseDouble`, méthodes, classes, constructeurs, `private`, héritage, `super`, `@Override`, polymorphisme, classes abstraites et interfaces.
 

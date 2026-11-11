@@ -11,6 +11,7 @@ import m10 from './missions/m10-combinee.js';
 import banque from './projects/banque.js';
 import depenses from './projects/depenses.js';
 import jeux from './projects/jeux.js';
+import employes from './projects/employes.js';
 
 // Catalogue des missions. Pour ajouter une mission jouable : créer un fichier dans missions/ et l'ajouter ici.
 
@@ -20,7 +21,7 @@ export const PROJECTS = [
   banque,
   depenses,
   jeux,
-  { id: 'gestion', title: 'Gestion des employés', summary: 'Classes Employe et Departement, listes, salaires et moyennes.' },
+  employes,
 ].map((p) => (p.levels ? p : { ...p, levels: [], upcoming: true }));
 
 export const MISSIONS = [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10];
