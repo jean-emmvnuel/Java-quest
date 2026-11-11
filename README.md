@@ -3,7 +3,7 @@
 Apprendre Java en voyant ce que le code fait réellement. Tout tourne dans le navigateur, sans backend.
 L'application est installable (PWA) et fonctionne **hors connexion**.
 
-Missions jouables : 1 Découverte · 2 Variables · 3 Conditions · 4 Boucles · 5 Tableaux · 6 Fonctions et procédures · 7 Classes et objets · 8 Héritage (38 niveaux).
+Missions jouables : 1 Découverte · 2 Variables · 3 Conditions · 4 Boucles · 5 Tableaux · 6 Fonctions et procédures · 7 Classes et objets · 8 Héritage · 9 POO approfondie (43 niveaux).
 
 ```bash
 npm install

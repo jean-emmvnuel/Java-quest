@@ -3,7 +3,7 @@
 
 const KW = new Set([
   'public', 'private', 'protected', 'static', 'final', 'class', 'void', 'new', 'return', 'if', 'else', 'while', 'for',
-  'do', 'break', 'continue', 'switch', 'case', 'default', 'true', 'false', 'null', 'var', 'this', 'extends', 'implements',
+  'do', 'break', 'continue', 'switch', 'case', 'default', 'true', 'false', 'null', 'var', 'this', 'super', 'extends', 'implements', 'abstract', 'interface',
 ]);
 const TYPES = new Set(['int', 'double', 'boolean', 'char', 'long', 'float', 'byte', 'short', 'String', 'System', 'Math']);
 

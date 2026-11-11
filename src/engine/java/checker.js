@@ -72,14 +72,23 @@ export function check(program, objects = {}) {
   // ---------- Types ----------
   const isClass = (t) => classes.has(t);
   const isRef = (t) => t === 'String' || t === 'null' || isArray(t) || isClass(t);
-  const isSub = (a, b) => {
-    let c = a;
-    while (c) {
-      if (c === b) return true;
-      c = classes.get(c)?.superName ?? null;
+  /** La classe elle-même, puis ses parents et ses interfaces (dans cet ordre). */
+  const ancestors = (name) => {
+    const out = [];
+    const seen = new Set();
+    const queue = [name];
+    while (queue.length) {
+      const n = queue.shift();
+      if (seen.has(n) || !classes.has(n)) continue;
+      seen.add(n);
+      const c = classes.get(n);
+      out.push(c);
+      if (c.superName) queue.push(c.superName);
+      queue.push(...c.interfaces);
     }
-    return false;
+    return out;
   };
+  const isSub = (a, b) => a === b || ancestors(a).some((c) => c.name === b);
 
   function assignError(dst, src) {
     if (dst === src) return null;
@@ -126,17 +135,33 @@ export function check(program, objects = {}) {
     for (const c of chain(clsName)) if (c.fields.has(name)) return c.fields.get(name);
     return null;
   };
-  const allMethods = (clsName, name) => chain(clsName).flatMap((c) => c.methods.filter((m) => m.name === name));
-  const methodNames = (clsName) => [...new Set(chain(clsName).flatMap((c) => c.methods.map((m) => m.name)))];
+  const allMethods = (clsName, name) => ancestors(clsName).flatMap((c) => c.methods.filter((m) => m.name === name));
+  const methodNames = (clsName) => [...new Set(ancestors(clsName).flatMap((c) => c.methods.map((m) => m.name)))];
+  const kindOf = (c) => (c.isInterface ? 'l\'interface' : 'la classe');
 
   // ---------- 1er passage : enregistrer les classes ----------
   for (const node of program.classes) {
     if (classes.has(node.name)) throw compileError(`La classe ${node.name} est déclarée deux fois.`, node.line);
     if (node.name === 'String' || PRIMS.has(node.name)) throw compileError(`${node.name} est déjà un type de Java : choisis un autre nom de classe.`, node.line);
-    classes.set(node.name, { name: node.name, superName: node.superName, node, fields: new Map(), methods: [], ctors: [] });
+    classes.set(node.name, {
+      name: node.name, superName: node.superName, interfaces: node.interfaces ?? [], isInterface: !!node.isInterface,
+      abstract: !!node.mods?.abstract, node, fields: new Map(), methods: [], ctors: [],
+    });
   }
   for (const c of classes.values()) {
+    for (const i of c.interfaces) {
+      const target = classes.get(i);
+      if (!target) {
+        const guess = closest(i, [...classes.keys()]);
+        throw compileError(`L'interface ${i} n'existe pas.`, c.node.line, guess ? `Voulais-tu écrire ${guess} ?` : undefined);
+      }
+      if (!target.isInterface) throw compileError(`${i} est une classe, pas une interface : pour en hériter, utilise extends ${i}.`, c.node.line);
+    }
+    if (c.isInterface && c.abstract) throw compileError('Une interface est déjà abstraite : pas besoin d\'écrire abstract.', c.node.line);
     if (!c.superName) continue;
+    if (classes.get(c.superName)?.isInterface) {
+      throw compileError(`${c.superName} est une interface : une classe l'utilise avec implements ${c.superName} (et non extends).`, c.node.line);
+    }
     if (!classes.has(c.superName)) {
       throw compileError(`La classe ${c.name} hérite de ${c.superName}, qui n'existe pas.`, c.node.line, closest(c.superName, [...classes.keys()]) ? `Voulais-tu écrire ${closest(c.superName, [...classes.keys()])} ?` : undefined);
     }
@@ -159,7 +184,16 @@ export function check(program, objects = {}) {
       m.params.forEach((p) => validType(p.type, p.line));
       const sig = sigOf(m.params);
       if (c.methods.some((o) => o.name === m.name && o.sig === sig)) throw compileError(`La méthode ${m.name}(${sig}) est déclarée deux fois dans ${c.name}.`, m.line);
-      c.methods.push({ name: m.name, params: m.params, sig, ret: m.ret, static: !!m.mods.static, private: !!m.mods.private, owner: c.name, node: m, line: m.line });
+      const abstract = !!m.mods.abstract || (c.isInterface && !m.mods.static);
+      if (abstract && !c.isInterface && !c.abstract) {
+        throw compileError(`La classe ${c.name} contient la méthode abstraite ${m.name} : elle doit elle-même être déclarée abstract.`, m.line,
+          `Écris : abstract class ${c.name} { … }`);
+      }
+      if (abstract && m.mods.private) throw compileError(`Une méthode abstraite ne peut pas être private : personne ne pourrait l'écrire.`, m.line);
+      c.methods.push({
+        name: m.name, params: m.params, sig, ret: m.ret, static: !!m.mods.static, private: !!m.mods.private,
+        public: !!m.mods.public || c.isInterface, abstract, owner: c.name, node: m, line: m.line,
+      });
     }
     for (const k of c.node.ctors) {
       k.params.forEach((p) => validType(p.type, p.line));
@@ -172,17 +206,36 @@ export function check(program, objects = {}) {
   // Redéfinitions (@Override)
   for (const c of classes.values()) {
     for (const m of c.methods) {
-      const parentM = c.superName ? allMethods(c.superName, m.name).find((o) => o.sig === m.sig) : null;
+      const parents = ancestors(c.name).slice(1);
+      const parentM = parents.flatMap((k) => k.methods).find((o) => o.name === m.name && o.sig === m.sig) ?? null;
       if (parentM) {
+        if (parentM.public && !m.public && !c.isInterface) {
+          throw compileError(`${m.name}(${m.sig}) doit être public : elle vient de ${kindOf(classes.get(parentM.owner))} ${parentM.owner}, où elle est publique.`, m.line,
+            `Ajoute public devant : public ${m.ret} ${m.name}(…)`);
+        }
         if (parentM.ret !== m.ret) throw compileError(`${m.name}(${m.sig}) redéfinit la méthode de ${parentM.owner} : elle doit renvoyer le même type (${parentM.ret}).`, m.line);
         if (parentM.static !== m.static) throw compileError(`${m.name} ne peut pas être static dans une classe et pas dans l'autre.`, m.line);
       }
       const ann = m.node.mods.annotations.find((a) => a.name === 'Override');
       if (ann && !parentM && !(m.name === 'toString' && m.sig === '' && m.ret === 'String')) {
-        throw compileError(`@Override : il n'y a aucune méthode ${m.name}(${m.sig}) à redéfinir dans ${c.superName ?? 'la classe parente'}.`, ann.line,
+        throw compileError(`@Override : il n'y a aucune méthode ${m.name}(${m.sig}) à redéfinir dans ${[c.superName, ...c.interfaces].filter(Boolean).join(' ou ') || 'la classe parente'}.`, ann.line,
           'Vérifie le nom (majuscules comprises) et les paramètres : ils doivent être identiques à ceux de la classe parente.');
       }
       if (m.node.mods.annotations.some((a) => a.name !== 'Override')) throw compileError('Seule l\'annotation @Override est prise en charge.', m.line);
+    }
+  }
+
+  // Une classe « normale » doit écrire toutes les méthodes abstraites qu'elle hérite
+  for (const c of classes.values()) {
+    if (c.isInterface || c.abstract) continue;
+    const concrete = (name, sig) => chain(c.name).some((k) => k.methods.some((m) => m.name === name && m.sig === sig && !m.abstract));
+    for (const k of ancestors(c.name).slice(1)) {
+      for (const m of k.methods) {
+        if (m.abstract && !concrete(m.name, m.sig)) {
+          throw compileError(`La classe ${c.name} doit écrire la méthode ${m.ret} ${m.name}(${m.sig}) de ${kindOf(k)} ${k.name}.`, c.node.line,
+            `C'est une méthode abstraite : chaque classe concrète doit l'écrire. Ajoute dans ${c.name} : ${m.public ? 'public ' : ''}${m.ret} ${m.name}(${m.params.map((p) => `${p.type} ${p.name}`).join(', ')}) { … }`);
+        }
+      }
     }
   }
 
@@ -463,6 +516,8 @@ export function check(program, objects = {}) {
           const guess = closest(e.cls, [...classes.keys()]);
           throw compileError(`La classe ${e.cls} n'existe pas.`, e.line, guess ? `Voulais-tu écrire ${guess} ?` : 'Écris d\'abord la classe : class ' + e.cls + ' { … }');
         }
+        if (c.isInterface) throw compileError(`${e.cls} est une interface : on ne peut pas créer d'objet avec new ${e.cls}(…).`, e.line, `Crée plutôt un objet d'une classe qui implémente ${e.cls}.`);
+        if (c.abstract) throw compileError(`${e.cls} est une classe abstraite : on ne peut pas créer d'objet avec new ${e.cls}(…).`, e.line, `Crée plutôt un objet d'une de ses sous-classes.`);
         const ts = e.args.map(expr);
         e.ctor = resolveCtor(c, ts, e.line);
         return e.cls;
@@ -816,6 +871,7 @@ export function check(program, objects = {}) {
     }
 
     for (const m of c.methods) {
+      if (!m.node.body) continue;
       inMethod(c, { isStatic: m.static, ret: m.ret, method: m, body: m.node.body }, () => {
         m.params.forEach((p) => declare(p.name, { type: p.type, init: true }, p.line));
         stmt(m.node.body);

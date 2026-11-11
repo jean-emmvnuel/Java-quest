@@ -124,5 +124,20 @@ fileOut('toString par défaut', 'class P { }\n' + main('P p = new P(); System.ou
 fileOut('static champ', main('compteur++; compteur++; System.out.println(compteur);', ' static int compteur = 0;'), '2\n');
 fileErr('StackOverflow', main('f(1);', ' static void f(int n) { f(n + 1); }'), /StackOverflow/);
 
+
+console.log('\nClasses abstraites et interfaces');
+const formes = `abstract class Forme {\n abstract double aire();\n String decrire() { return "Aire : " + aire(); }\n}\nclass Carre extends Forme {\n double c;\n Carre(double c) { this.c = c; }\n double aire() { return c * c; }\n}\n`;
+fileOut('classe abstraite', formes + main('Forme f = new Carre(3); System.out.println(f.decrire());'), 'Aire : 9.0\n');
+fileErr('new sur abstraite', formes + main('Forme f = new Forme();'), /abstraite/);
+fileErr('méthode abstraite oubliée', 'abstract class A { abstract int f(); }\nclass B extends A { }\n' + main(''), /doit écrire la méthode/);
+fileErr('abstract sans classe abstract', 'class A { abstract int f(); }\n' + main(''), /doit elle-même être déclarée abstract/);
+const iface = `interface Rechargeable {\n int batterie();\n void recharger();\n}\ninterface Volant { String voler(); }\nclass Drone implements Rechargeable, Volant {\n private int b = 30;\n public int batterie() { return b; }\n public void recharger() { b = 100; }\n public String voler() { return "Je vole"; }\n}\n`;
+fileOut('interfaces multiples', iface + main('Rechargeable r = new Drone(); r.recharger(); System.out.println(r.batterie()); Volant v = new Drone(); System.out.println(v.voler());'), '100\nJe vole\n');
+fileErr('public oublié', 'interface I { void f(); }\nclass A implements I { void f() { } }\n' + main(''), /public/);
+fileErr('new interface', 'interface I { void f(); }\n' + main('I i = new I();'), /interface/);
+fileErr('extends interface', 'interface I { void f(); }\nclass A extends I { public void f() { } }\n' + main(''), /implements/);
+fileErr('méthode interface manquante', 'interface I { void f(); }\nclass A implements I { }\n' + main(''), /doit écrire la méthode void f\(\)/);
+fileOut('tableau d\'interface', iface + main('Rechargeable[] t = {new Drone(), new Drone()}; int s = 0; for (Rechargeable r : t) { s += r.batterie(); } System.out.println(s);'), '60\n');
+
 console.log(failures ? `\n${failures} échec(s)` : '\nTout est vert.');
 process.exit(failures ? 1 : 0);

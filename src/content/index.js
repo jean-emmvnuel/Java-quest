@@ -6,12 +6,12 @@ import m5 from './missions/m5-tableaux.js';
 import m6 from './missions/m6-fonctions.js';
 import m7 from './missions/m7-objets.js';
 import m8 from './missions/m8-heritage.js';
+import m9 from './missions/m9-poo.js';
 
 // Catalogue des missions. Pour ajouter une mission jouable : créer un fichier dans missions/ et l'ajouter ici.
 
 // Missions à venir : elles demandent d'étendre l'interpréteur (tableaux, méthodes, classes).
 const UPCOMING = [
-  { id: 'poo', num: 9, title: 'POO approfondie', place: 'Plusieurs missions', summary: 'Polymorphisme, interfaces et classes abstraites, à travers plusieurs missions.' },
   { id: 'combinee', num: 10, title: 'Mission combinée', place: 'La journée de l\'entrepôt', summary: 'Une mission complète qui réunit toutes les notions vues jusqu\'ici.' },
 ].map((m) => ({ ...m, levels: [], upcoming: true }));
 
@@ -22,7 +22,7 @@ export const PROJECTS = [
   { id: 'gestion', title: 'Gestion des employés', summary: 'Classes Employe et Departement, listes, salaires et moyennes.' },
 ];
 
-export const MISSIONS = [m1, m2, m3, m4, m5, m6, m7, m8, ...UPCOMING];
+export const MISSIONS = [m1, m2, m3, m4, m5, m6, m7, m8, m9, ...UPCOMING];
 
 /** Liste à plat de tous les niveaux jouables, avec leur mission. */
 export const LEVELS = MISSIONS.flatMap((m) => m.levels.map((l) => ({ ...l, mission: m })));

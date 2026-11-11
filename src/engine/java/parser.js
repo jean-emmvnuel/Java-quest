@@ -7,7 +7,7 @@ import { compileError } from './errors.js';
 export const PRIMITIVES = new Set(['int', 'double', 'boolean', 'char']);
 const UNSUPPORTED_TYPES = new Set(['long', 'float', 'byte', 'short']);
 const ASSIGN_OPS = new Set(['=', '+=', '-=', '*=', '/=', '%=']);
-const MODIFIERS = new Set(['public', 'private', 'protected', 'static', 'final']);
+const MODIFIERS = new Set(['public', 'private', 'protected', 'static', 'final', 'abstract']);
 
 export function parse(tokens) {
   let pos = 0;
@@ -87,7 +87,7 @@ export function parse(tokens) {
     const classes = [];
     while (!is('eof')) {
       const mods = parseModifiers();
-      if (!isKw('class')) {
+      if (!isKw('class') && !isKw('interface')) {
         const tok = peek();
         if (isOp('}')) throw compileError('Accolade fermante } en trop.', tok.line, 'Compte les accolades : chaque { a une seule } qui la ferme.');
         throw compileError(`Une classe est attendue ici (class Nom { … }), mais ${describe(tok)} trouvé.`, tok.line,
@@ -120,16 +120,28 @@ export function parse(tokens) {
 
   function parseClass(mods) {
     const kw = next();
-    const name = expectIdent('classe');
+    const isInterface = kw.v === 'interface';
+    const name = expectIdent(isInterface ? 'interface' : 'classe');
     let superName = null;
+    const interfaces = [];
+    const nameList = () => {
+      do { interfaces.push(expectIdent('interface').v); } while (accept('op', ','));
+    };
     if (is('id', 'extends')) {
       next();
-      superName = expectIdent('classe').v;
-    } else if (is('id', 'implements')) {
-      throw compileError('Les interfaces arrivent dans une prochaine mission.', peek().line);
+      if (isInterface) nameList();
+      else {
+        superName = expectIdent('classe').v;
+        if (isOp(',')) throw compileError('Une classe ne peut hériter (extends) que d\'une seule classe.', peek().line, 'Pour avoir plusieurs comportements, utilise des interfaces : implements A, B');
+      }
+    }
+    if (is('id', 'implements')) {
+      if (isInterface) throw compileError('Une interface hérite d\'autres interfaces avec extends, pas implements.', peek().line);
+      next();
+      nameList();
     }
     const open = expectOp('{');
-    const cls = { type: 'Class', name: name.v, superName, fields: [], methods: [], ctors: [], line: kw.line, mods };
+    const cls = { type: 'Class', name: name.v, superName, interfaces, isInterface, fields: [], methods: [], ctors: [], line: kw.line, mods };
     while (!isOp('}')) {
       if (is('eof')) throw compileError(`Accolade fermante } manquante pour la classe ${name.v}.`, prev().line, `La classe ouverte ligne ${open.line} n'est jamais refermée.`);
       parseMember(cls);
@@ -141,10 +153,11 @@ export function parse(tokens) {
   function parseMember(cls) {
     const startTok = peek();
     const mods = parseModifiers();
-    if (isKw('class')) throw compileError('Une classe ne peut pas être écrite à l\'intérieur d\'une autre ici : sors-la de la classe.', peek().line);
+    if (isKw('class') || isKw('interface')) throw compileError('Une classe ne peut pas être écrite à l\'intérieur d\'une autre ici : sors-la de la classe.', peek().line);
 
     // Constructeur : NomDeLaClasse(…)
     if (is('id', cls.name) && isOp('(', 1)) {
+      if (cls.isInterface) throw compileError('Une interface n\'a pas de constructeur.', peek().line);
       const nameTok = next();
       const params = parseParams();
       const body = parseBlock();
@@ -165,12 +178,23 @@ export function parse(tokens) {
 
     if (isOp('(')) {
       const params = parseParams();
-      if (isOp(';')) throw compileError(`La méthode ${nameTok.v} n'a pas de corps : ajoute { … } après les parenthèses.`, nameTok.line);
-      const body = parseBlock();
+      let body = null;
+      if (isOp(';')) {
+        if (!mods.abstract && !cls.isInterface) {
+          throw compileError(`La méthode ${nameTok.v} n'a pas de corps : ajoute { … } après les parenthèses.`, nameTok.line,
+            'Une méthode sans corps doit être déclarée abstract (dans une classe abstraite) ou se trouver dans une interface.');
+        }
+        next();
+      } else {
+        if (mods.abstract) throw compileError(`La méthode abstraite ${nameTok.v} ne doit pas avoir de corps : termine-la par un point-virgule.`, nameTok.line, `abstract ${ret} ${nameTok.v}(…);`);
+        if (cls.isInterface && !mods.static) throw compileError(`Dans une interface, la méthode ${nameTok.v} s'écrit sans corps, terminée par un point-virgule.`, nameTok.line);
+        body = parseBlock();
+      }
       cls.methods.push({ type: 'Method', name: nameTok.v, params, ret, body, mods, line: nameTok.line, owner: cls.name });
       return;
     }
     if (ret === 'void') throw compileError(`Un attribut ne peut pas être de type void.`, nameTok.line);
+    if (cls.isInterface) throw compileError('Les attributs d\'interface ne sont pas pris en charge : une interface décrit seulement des méthodes.', nameTok.line);
     // Attribut(s)
     let tok = nameTok;
     for (;;) {

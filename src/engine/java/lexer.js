@@ -3,7 +3,7 @@ import { compileError } from './errors.js';
 export const KEYWORDS = new Set([
   'int', 'double', 'boolean', 'char', 'long', 'float', 'byte', 'short', 'void', 'var',
   'if', 'else', 'while', 'for', 'do', 'break', 'continue', 'return', 'switch', 'case', 'default',
-  'true', 'false', 'null', 'new', 'final', 'static', 'public', 'private', 'protected', 'class', 'this', 'super',
+  'true', 'false', 'null', 'new', 'final', 'static', 'public', 'private', 'protected', 'class', 'this', 'super', 'abstract', 'interface',
 ]);
 
 const OPS = [

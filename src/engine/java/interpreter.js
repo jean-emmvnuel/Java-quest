@@ -218,7 +218,7 @@ export function execute(program, { world, api = {} }) {
   const findMethodRuntime = (clsName, name, sig) => {
     let c = classes.get(clsName);
     while (c) {
-      const m = c.methods.find((x) => x.name === name && x.sig === sig);
+      const m = c.methods.find((x) => x.name === name && x.sig === sig && !x.abstract);
       if (m) return m;
       c = c.superName ? classes.get(c.superName) : null;
     }
@@ -801,8 +801,7 @@ export function execute(program, { world, api = {} }) {
     frames.pop();
 
     const main = program.main;
-    frames.push({ label: 'main', self: null, scopes: [new Map([['args', { type: 'String[]', value: newArray('String[]', []) }]])], cls: main.owner });
-    frame().scopes[0].delete('args'); // inutile pour les débutants : on ne l'affiche pas
+    frames.push({ label: 'main', self: null, scopes: [new Map()], cls: main.owner });
     record(null, 'Le programme démarre dans la méthode main. La mémoire est vide.', 'start');
     withScope(() => {
       try {
