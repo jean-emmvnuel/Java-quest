@@ -30,7 +30,7 @@ src/
     projects/        Projets de la vie réelle (étapes qui reprennent le code précédent : carry)
     validators.js    Aides de validation partagées
     index.js         Catalogue : missions, projets à venir, liste des niveaux
-  state/             Hooks React : progression (étoiles), exécution automatique, lecture de la trace
+  state/             Hooks React : progression (base SQLite dans le navigateur, code de reprise), exécution automatique, lecture de la trace
   ui/                Composants, chacun avec sa feuille de style
   styles/            Tokens de design (thème clair) et styles de base
 tests/               npm test : chaque solution passe, chaque code de départ échoue

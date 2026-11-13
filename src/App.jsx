@@ -247,7 +247,7 @@ export default function App() {
         resultTone={stageStatus === 'passed' ? 'ok' : stageStatus === 'failed' || stageStatus === 'error' ? 'ko' : null}
       />
 
-      <MissionMap open={mapOpen} onClose={() => setMapOpen(false)} currentId={level.id} stars={progress.stars} onPick={goTo} />
+      <MissionMap open={mapOpen} onClose={() => setMapOpen(false)} currentId={level.id} stars={progress.stars} onPick={goTo} progress={progress} />
 
       <SuccessDialog
         open={!!win && win.runId === runId}

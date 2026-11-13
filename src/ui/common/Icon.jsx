@@ -13,6 +13,8 @@ const PATHS = {
   map: 'M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14',
   book: 'M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5zM4 19a2 2 0 0 1 2-2h13',
   code: 'M8 7 3 12l5 5M16 7l5 5-5 5M13.5 5l-3 14',
+  copy: 'M9 9h11v11H9zM5 15H4V4h11v1',
+  download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
 };
 
 export default function Icon({ name, size = 18, className = '' }) {

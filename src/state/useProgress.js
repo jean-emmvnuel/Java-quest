@@ -1,8 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { LEVELS } from '../content/index.js';
+import { openProgressStore } from './sqlStore.js';
+import { encodeResumeCode, decodeResumeCode } from './progressDb.js';
 
-// Progression du joueur, sauvegardée dans le navigateur :
-// niveau courant, code de chaque niveau, étoiles gagnées, indices utilisés.
+// Progression du joueur : niveau courant, code de chaque niveau, étoiles gagnées, indices utilisés.
+// Elle est enregistrée dans une base SQLite du navigateur (voir progressDb.js) ;
+// le localStorage en garde une copie de secours, lue instantanément au démarrage
+// et utilisée seule si SQLite ou IndexedDB ne sont pas disponibles.
 
 const KEY = 'javaquest.progress.v2';
 
@@ -27,6 +31,9 @@ function load() {
   return empty();
 }
 
+/** Garde un niveau courant valide (un niveau a pu être renommé ou retiré). */
+const sanitize = (s) => (LEVELS.some((l) => l.id === s.current) ? s : { ...s, current: LEVELS[0].id });
+
 /** 3 étoiles sans aide, 2 avec des indices, 1 après avoir regardé la solution. */
 export function starsFor(hintsUsed, sawSolution) {
   if (sawSolution) return 1;
@@ -34,11 +41,33 @@ export function starsFor(hintsUsed, sawSolution) {
 }
 
 export function useProgress() {
-  const [state, setState] = useState(load);
+  const [state, setStateRaw] = useState(load);
+  // 'loading' → 'sql' (base SQLite prête) ou 'local' (secours localStorage)
+  const [storage, setStorage] = useState('loading');
+  const store = useRef(null);
+
+  // Chaque changement est horodaté : au démarrage, la copie la plus récente l'emporte.
+  const setState = useCallback((fn) => setStateRaw((s) => ({ ...fn(s), savedAt: Date.now() })), []);
+
+  useEffect(() => {
+    let alive = true;
+    openProgressStore()
+      .then((st) => {
+        if (!alive) return;
+        store.current = st;
+        setStateRaw((local) => (st.state && st.state.savedAt >= (local.savedAt ?? 0) ? sanitize({ ...empty(), ...st.state }) : local));
+        setStorage('sql');
+      })
+      .catch(() => { if (alive) setStorage('local'); });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignoré */ }
-  }, [state]);
+    if (store.current) {
+      try { store.current.save(state); } catch { /* le localStorage reste à jour */ }
+    }
+  }, [state, storage]);
 
   const patch = (field, id, value) => setState((s) => ({ ...s, [field]: { ...s[field], [id]: value } }));
 
@@ -58,6 +87,16 @@ export function useProgress() {
     totalStars: Object.values(state.stars).reduce((a, b) => a + b, 0),
     streak: state.streak?.last === today() || state.streak?.last === yesterday() ? state.streak.days : 0,
     playedToday: state.streak?.last === today(),
+    storage,
+    /** Code à copier pour reprendre la partie sur un autre appareil. */
+    resumeCode: () => encodeResumeCode(state),
+    /** Remplace la progression par celle d'un code de reprise (lève une erreur si le code est invalide). */
+    importCode: async (code) => {
+      const next = await decodeResumeCode(code);
+      setState(() => sanitize({ ...empty(), ...next }));
+    },
+    /** Fichier .sqlite de la base (null si SQLite n'est pas disponible). */
+    exportDatabase: () => store.current?.exportFile() ?? null,
     goTo: useCallback((id) => setState((s) => ({ ...s, current: id })), []),
     setCode: (code) => patch('codes', level.id, code),
     useHint: () => patch('hints', level.id, (state.hints[level.id] ?? 0) + 1),

@@ -114,3 +114,43 @@
 }
 
 .privacy-note { margin: 4px 4px 0; font-size: 12px; line-height: 1.5; color: var(--ink-4); text-align: center; }
+
+/* ---------- Ma sauvegarde ---------- */
+.save-panel { padding: 16px; border-radius: 22px; background: #fff; border: 3px solid var(--line); display: flex; flex-direction: column; gap: 12px; }
+.save-head h3 { margin: 0; font: 700 19px var(--font-display); }
+.save-status { display: flex; align-items: center; gap: 8px; margin: 2px 0 0; font-size: 14px; color: var(--ink-3); }
+.save-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); flex: none; }
+.save-sql .save-dot { background: var(--green); }
+.save-local .save-dot { background: var(--yellow); }
+.save-loading .save-dot { animation: pulse 1.4s ease-in-out infinite; }
+.save-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.save-code {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 3px solid var(--line);
+  background: #f6f8fc;
+  font: 500 12px/1.4 var(--mono);
+  color: var(--ink-2);
+  resize: none;
+  word-break: break-all;
+}
+.save-label { font: 700 14px var(--font-display); color: var(--ink-2); }
+.save-restore { display: flex; gap: 10px; }
+.save-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 3px solid var(--line);
+  font: 500 15px var(--mono);
+  color: var(--ink);
+  background: #fff;
+}
+.save-input:focus { outline: none; border-color: var(--blue); }
+.save-msg { margin: 0; font-size: 14px; font-weight: 600; }
+.save-msg-ok { color: var(--green-dark); }
+.save-msg-ko { color: #d64545; }
+@media (max-width: 640px) {
+  .save-actions .btn { flex: 1 1 100%; justify-content: center; }
+}

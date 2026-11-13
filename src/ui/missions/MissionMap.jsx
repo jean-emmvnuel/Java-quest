@@ -2,10 +2,11 @@ import { useEffect, useRef } from 'react';
 import { MISSIONS, PROJECTS } from '../../content/index.js';
 import Icon from '../common/Icon.jsx';
 import Stars from '../common/Stars.jsx';
+import SavePanel from './SavePanel.jsx';
 import './missions.css';
 
 /** Carte du monde : les missions comme des îles, les niveaux comme des étapes sur un chemin. */
-export default function MissionMap({ open, onClose, currentId, stars, onPick }) {
+export default function MissionMap({ open, onClose, currentId, stars, onPick, progress }) {
   const panel = useRef(null);
   useEffect(() => {
     if (!open) return undefined;
@@ -48,9 +49,12 @@ export default function MissionMap({ open, onClose, currentId, stars, onPick }) 
             </div>
           </section>
 
+          <SavePanel progress={progress} />
+
           <p className="privacy-note">
             Java Quest compte ses visiteurs de façon anonyme : seuls la ville et le pays sont notés,
-            jamais ton adresse IP ni ton code. Ta progression reste uniquement sur cet appareil.
+            jamais ton adresse IP ni ton code. Ta progression reste dans une base SQLite sur cet appareil :
+            elle n'est envoyée nulle part, sauf si tu copies toi-même ton code de reprise.
           </p>
         </div>
       </div>
